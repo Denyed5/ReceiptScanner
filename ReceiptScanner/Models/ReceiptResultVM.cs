@@ -1,10 +1,8 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace ReceiptScanner.Models
+﻿namespace ReceiptScanner.Models
 {
     public class ReceiptResultVM
     {
-        public string? VendorName { get; set;}  
+        public string? VendorName { get; set; }
         public string? Total { get; set; }
         public string? Date { get; set; }
         public string RawText { get; set; } = "";

@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using ReceiptScanner.Models;
+using System.Diagnostics;
 
 namespace ReceiptScanner.Controllers
 {

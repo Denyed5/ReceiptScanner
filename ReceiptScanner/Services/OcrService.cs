@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using ReceiptScanner.Models;
+﻿using ReceiptScanner.Models;
 using Tesseract;
 
 

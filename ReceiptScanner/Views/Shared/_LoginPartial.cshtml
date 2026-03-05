@@ -1,0 +1,27 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using ReceiptScanner.Areas.Identity.Data
+@inject SignInManager<ReceiptScannerUser> SignInManager
+@inject UserManager<ReceiptScannerUser> UserManager
+
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item">
+            <a class="nav-link">Hello @User.Identity?.Name!</a>
+        </li>
+        <li class="nav-item">
+            <form asp-area="Identity" asp-page="/Account/Logout" method="post">
+                <button class="nav-link btn btn-link">Logout</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        </li>
+    }
+</ul>

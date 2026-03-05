@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ReceiptScanner.Models;
 using ReceiptScanner.Services;
 
@@ -38,7 +37,7 @@ namespace ReceiptScanner.Controllers
             List<ReceiptItem> items = _parser.ExtractPurchases(result.RawText);
 
 
-            result.VendorName ="Търговец: " + vendorLine;
+            result.VendorName = "Търговец: " + vendorLine;
             result.Date = "Дата: " + date;
             result.Total = "Общо: " + total;
             result.Items = items;

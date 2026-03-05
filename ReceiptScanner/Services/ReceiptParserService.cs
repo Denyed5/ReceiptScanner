@@ -1,8 +1,4 @@
 ﻿using ReceiptScanner.Models;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ReceiptScanner.Services
@@ -12,9 +8,9 @@ namespace ReceiptScanner.Services
         // ------------------------------- Извличане на търговец -------------------------------- //
 
         // Търсени думи
-        private static readonly string[] LegalKeywordsVendor = 
-        {   "ЕООД", "ООД", "АД", 
-            "ЕТ", "КД", "Пацони", 
+        private static readonly string[] LegalKeywordsVendor =
+        {   "ЕООД", "ООД", "АД",
+            "ЕТ", "КД", "Пацони",
             "Кауфланд", "Лидл" };
 
         // Избягвани думи
@@ -90,7 +86,7 @@ namespace ReceiptScanner.Services
 
         // ------------------------------- Извличане на датата -------------------------------- //
 
-        public string? ExtractDateTime(string rawText) 
+        public string? ExtractDateTime(string rawText)
         {
             var regex = new Regex(@"\d{1,2}[./-]\d{1,2}[./-]\d{2,4}(\s+\d{1,2}:\d{2})?|\d{4}[./-]\d{1,2}[./-]\d{1,2}(\s+\d{1,2}:\d{2})?"); // regex за формата ДД.ММ.ГГГГ, ДД/ММ/ГГГГ, ДД-ММ-ГГГГ, ГГГГ.ММ.ДД, ГГГГ/ММ/ДД, ГГГГ-ММ-ДД
             var lines = GetCleanLines(rawText);
@@ -111,7 +107,7 @@ namespace ReceiptScanner.Services
 
         // ------------------------------- Извличане на общата сума -------------------------------- //
 
-        public string? ExtractTotalSum(string rawText) 
+        public string? ExtractTotalSum(string rawText)
         {
             var lines = GetCleanLines(rawText);
 
