@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Upload Receipt";
+}
+
+<h2>Upload Receipt</h2>
+
+<form method="post" enctype="multipart/form-data">
+
+    <div class="mb-3">
+        <label class="form-label">Качи касова бележка</label>
+        <input class="form-control" type="file" name="file" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Избери език за OCR</label>
+
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="Language" value="bul+eng" id="lang1" checked>
+            <label class="form-check-label" for="lang1">
+                Български и английски
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="Language" value="bul" id="lang2">
+            <label class="form-check-label" for="lang2">
+                Български
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="Language" value="eng" id="lang3">
+            <label class="form-check-label" for="lang3">
+                Английски
+            </label>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Сканирай</button>
+
+</form>
+@if (ViewBag.Message != null)
+{
+    <p>@ViewBag.Message</p>
+}

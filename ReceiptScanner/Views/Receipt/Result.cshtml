@@ -1,0 +1,29 @@
+﻿<h2>OCR Result</h2>
+
+<p><b>Confidence:</b> @(Model.Confidence)%</p>
+
+<h3>Извлечени данни</h3>
+<pre>@Model.VendorName</pre>
+<pre>@Model.Date</pre>
+<pre>@Model.Total</pre>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Продукт</th>
+            <th>Количество</th>
+            <th>Ед. цена</th>
+            <th>Общо</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.UnitPrice</td>
+                <td>@item.TotalPrice</td>
+            </tr>
+        }
+    </tbody>
+</table>
