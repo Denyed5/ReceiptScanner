@@ -255,7 +255,7 @@ namespace ReceiptScanner.Controllers
                 finalBytes = imageBytes;
             }
 
-            var result = await _ocr.ReadTextAsync(finalBytes, model.Language);
+            var result = await _ocr.ReadText(finalBytes, model.Language);
 
             string? vendorLine = _parser.ExtractVendorLine(result.RawText, 5);
             if (vendorLine == "Не може да бъде извлечен.")

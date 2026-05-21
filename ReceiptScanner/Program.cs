@@ -22,8 +22,6 @@ builder.Services.AddScoped<ImagePreprocessingService>();
 
 var app = builder.Build();
 
-app.MapRazorPages();
-
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

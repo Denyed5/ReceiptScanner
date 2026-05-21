@@ -12,7 +12,7 @@ namespace ReceiptScanner.Services
             _env = env;
         }
 
-        public async Task<ReceiptModel> ReadTextAsync(byte[] imageBytes, string language = "bul+eng")
+        public async Task<ReceiptModel> ReadText(byte[] imageBytes, string language = "bul+eng")
         {
             ReceiptModel result = new();
             var tessDataPath = Path.Combine(_env.ContentRootPath, "tessdata");
