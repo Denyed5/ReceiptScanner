@@ -1,0 +1,159 @@
+﻿@model List<ReceiptScanner.Models.ReceiptModel>
+
+@{
+    ViewData["Title"] = "Receipt History";
+
+    string sortBy = ViewBag.SortBy as string ?? "date";
+    string sortDirection = ViewBag.SortDirection as string ?? "desc";
+
+    string NextDirection(string column)
+    {
+        if (sortBy == column && sortDirection == "asc")
+        {
+            return "desc";
+        }
+
+        return "asc";
+    }
+}
+
+<section class="py-4 py-lg-5">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+            <div>
+                <h1 class="h2 fw-bold mb-2">Receipt history</h1>
+                <p class="text-muted mb-0">
+                    View your saved receipts and open each receipt to see its items.
+                </p>
+            </div>
+
+            <div class="d-grid d-md-block">
+                <a asp-controller="Receipt" asp-action="Upload" class="btn btn-primary btn-lg">
+                    Scan receipt
+                </a>
+            </div>
+        </div>
+
+        @if (Model.Count == 0)
+        {
+            <div class="border rounded-3 p-4 p-md-5 text-center">
+                <h2 class="h4 fw-semibold mb-2">No saved receipts</h2>
+                <p class="text-muted mb-4">
+                    Your saved receipts will appear here after you scan and confirm them.
+                </p>
+                <a asp-controller="Receipt" asp-action="Upload" class="btn btn-primary btn-lg">
+                    Scan first receipt
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="border rounded-3 p-3 p-md-4">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 70px;">No.</th>
+                                <th>Vendor</th>
+                                <th>
+                                    <a asp-controller="Receipt"
+                                           asp-action="History"
+                                           asp-route-sortBy="date"
+                                           asp-route-sortDirection="@NextDirection("date")"
+                                           class="link-dark text-decoration-none">
+                                        Date
+                                    </a>
+                                </th>
+                                <th class="text-end">
+                                    <a asp-controller="Receipt"
+                                           asp-action="History"
+                                           asp-route-sortBy="total"
+                                           asp-route-sortDirection="@NextDirection("total")"
+                                           class="link-dark text-decoration-none">
+                                        Total BGN
+                                    </a>
+                                </th>
+                                <th class="text-end">Total EUR</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @for (int i = 0; i < Model.Count; i++)
+                            {
+                                var receipt = Model[i];
+
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td>@(receipt.VendorName ?? "Unknown vendor")</td>
+                                    <td>@(receipt.Date?.ToString("dd.MM.yyyy HH:mm") ?? "-")</td>
+                                    <td class="text-end">@((receipt.TotalBGN ?? 0).ToString("0.00")) лв.</td>
+                                    <td class="text-end">@((receipt.TotalEUR ?? 0).ToString("0.00")) EUR</td>
+                                    <td class="text-end">
+                                        <div class="receipt-action-buttons">
+                                            <a asp-controller="Receipt"
+                                                   asp-action="Details"
+                                                   asp-route-id="@receipt.ReceiptId"
+                                                   class="btn btn-outline-primary btn-sm">
+                                                Open
+                                            </a>
+
+                                            <a asp-controller="Receipt"
+                                                   asp-action="Edit"
+                                                   asp-route-id="@receipt.ReceiptId"
+                                                   class="btn btn-outline-secondary btn-sm">
+                                                Edit
+                                            </a>
+
+                                            <button type="button"
+                                                    class="btn btn-outline-danger btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteReceiptModal"
+                                                    data-receipt-id="@receipt.ReceiptId"
+                                                    data-receipt-name="@(receipt.VendorName ?? "Unknown vendor")">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<div class="modal fade" id="deleteReceiptModal" tabindex="-1" aria-labelledby="deleteReceiptModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="deleteReceiptModalLabel">Delete receipt</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                Are you sure you want to delete <strong id="deleteReceiptName">this receipt</strong>? This action cannot be undone.
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <form asp-controller="Receipt" asp-action="Delete" method="post" class="m-0">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="deleteReceiptId" />
+                    <button type="submit" class="btn btn-danger">
+                        Delete receipt
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/receipt-history.js" asp-append-version="true"></script>
+}

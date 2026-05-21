@@ -1,30 +1,31 @@
 ﻿@model ReceiptScanner.Models.ReceiptModel
 
 @{
-    ViewData["Title"] = "OCR Result";
+    ViewData["Title"] = "Edit Receipt";
 }
 
 <section class="py-4 py-lg-5">
     <div class="container">
-        @using (Html.BeginForm("ConfirmReceipt", "Receipt", FormMethod.Post))
+        @using (Html.BeginForm("Edit", "Receipt", FormMethod.Post))
         {
             @Html.AntiForgeryToken()
+            <input asp-for="ReceiptId" type="hidden" />
             <input asp-for="RawText" type="hidden" />
-            <input asp-for="IsDateSuggested" type="hidden" />
-            <input asp-for="IsTotalBGNSuggested" type="hidden" />
-            <input asp-for="IsTotalEURSuggested" type="hidden" />
 
             <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
                 <div>
-                    <h1 class="h2 fw-bold mb-2">Review OCR result</h1>
+                    <h1 class="h2 fw-bold mb-2">Edit receipt</h1>
                     <p class="text-muted mb-0">
-                        Check the extracted receipt data, fix mistakes, add missing items, or remove incorrect rows.
+                        Update the saved receipt summary and item list.
                     </p>
                 </div>
 
-                <div class="d-grid d-md-block">
+                <div class="d-grid d-md-flex gap-2">
+                    <a asp-controller="Receipt" asp-action="Details" asp-route-id="@Model.ReceiptId" class="btn btn-outline-secondary btn-lg">
+                        Cancel
+                    </a>
                     <button type="submit" class="btn btn-success btn-lg">
-                        Confirm and save
+                        Save changes
                     </button>
                 </div>
             </div>
@@ -44,38 +45,20 @@
 
                         <div class="mb-3">
                             <label asp-for="Date" class="form-label">Date</label>
-                            <input asp-for="Date" class="form-control @(Model.IsDateSuggested ? "suggested-field" : "")" />
+                            <input asp-for="Date" class="form-control" />
                             <span asp-validation-for="Date" class="text-danger small"></span>
-                            @if (Model.IsDateSuggested)
-                            {
-                                <div class="form-text text-warning-emphasis">
-                                    Date was not detected, so the current date and time were suggested.
-                                </div>
-                            }
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="TotalBGN" class="form-label">Total in BGN</label>
-                            <input asp-for="TotalBGN" class="form-control @(Model.IsTotalBGNSuggested ? "suggested-field" : "")" />
+                            <input asp-for="TotalBGN" class="form-control" />
                             <span asp-validation-for="TotalBGN" class="text-danger small"></span>
-                            @if (Model.IsTotalBGNSuggested)
-                            {
-                                <div class="form-text text-warning-emphasis">
-                                    BGN total was calculated from EUR using the fixed conversion rate.
-                                </div>
-                            }
                         </div>
 
                         <div class="mb-0">
                             <label asp-for="TotalEUR" class="form-label">Total in EUR</label>
-                            <input asp-for="TotalEUR" class="form-control @(Model.IsTotalEURSuggested ? "suggested-field" : "")" />
+                            <input asp-for="TotalEUR" class="form-control" />
                             <span asp-validation-for="TotalEUR" class="text-danger small"></span>
-                            @if (Model.IsTotalEURSuggested)
-                            {
-                                <div class="form-text text-warning-emphasis">
-                                    EUR total was calculated from BGN using the fixed conversion rate.
-                                </div>
-                            }
                         </div>
                     </div>
                 </div>
@@ -85,7 +68,7 @@
                         <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mb-3">
                             <div>
                                 <h2 class="h5 fw-semibold mb-1">Purchased items</h2>
-                                <p class="text-muted small mb-0">Edit the table before saving the receipt.</p>
+                                <p class="text-muted small mb-0">Add, remove, or correct saved receipt items.</p>
                             </div>
 
                             <button id="addItemBtn" type="button" class="btn btn-outline-primary">
@@ -151,31 +134,14 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="col-12">
-                    <div class="border rounded-3 p-3 p-md-4">
-                        <h2 class="h5 fw-semibold mb-3">Raw OCR text</h2>
-
-                        @if (Model.RawTextLines.Count > 0)
-                        {
-                            <div class="bg-light border rounded-3 p-3 small">
-                                @foreach (var item in Model.RawTextLines)
-                                {
-                                    <div>@item</div>
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            <p class="text-muted mb-0">No raw text lines available.</p>
-                        }
-                    </div>
-                </div>
             </div>
 
-            <div class="d-grid d-md-flex justify-content-md-end mt-4">
+            <div class="d-grid d-md-flex justify-content-md-end gap-2 mt-4">
+                <a asp-controller="Receipt" asp-action="Details" asp-route-id="@Model.ReceiptId" class="btn btn-outline-secondary btn-lg">
+                    Cancel
+                </a>
                 <button type="submit" class="btn btn-success btn-lg">
-                    Confirm and save
+                    Save changes
                 </button>
             </div>
         }

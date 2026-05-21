@@ -1,31 +1,247 @@
-html {
-  font-size: 14px;
+.crop-container {
+    min-height: 260px;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    .crop-container img[src=""],
+    .crop-container img:not([src]) {
+        display: none;
+    }
+
+@media (max-width: 575.98px) {
+    .display-5 {
+        font-size: 2rem;
+    }
+
+    .btn-lg {
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .crop-container {
+        min-height: 220px;
+    }
+
+    .table-responsive {
+        border: 1px solid var(--bs-border-color);
+        border-radius: 0.5rem;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.receipt-items-table {
+    min-width: 720px;
+    table-layout: fixed;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+    .receipt-items-table .item-name-col {
+        width: 36%;
+    }
+
+    .receipt-items-table .item-quantity-col {
+        width: 8%;
+    }
+
+    .receipt-items-table .item-price-col {
+        width: 12%;
+    }
+
+    .receipt-items-table .item-category-col {
+        width: 22%;
+    }
+
+    .receipt-items-table .item-action-col {
+        width: 6%;
+    }
+
+    .receipt-items-table input {
+        min-width: 0;
+    }
+
+    .receipt-items-table .item-quantity,
+    .receipt-items-table .item-unit-price,
+    .receipt-items-table .item-total-price {
+        text-align: right;
+    }
+
+    .receipt-items-table .remove-item-btn {
+        width: 2rem;
+        height: 2rem;
+        padding: 0;
+        line-height: 1;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+.suggested-field {
+    background-color: #fff3cd;
+    border-color: #ffda6a;
 }
 
-body {
-  margin-bottom: 60px;
+    .suggested-field:focus {
+        background-color: #fff8e1;
+        border-color: #ffda6a;
+    }
+
+.white-space-pre-wrap {
+    white-space: pre-wrap;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+@media (max-width: 767.98px) {
+    .receipt-items-table {
+        min-width: 0;
+        width: 100%;
+        table-layout: auto;
+    }
+
+        .receipt-items-table thead,
+        .receipt-items-table colgroup {
+            display: none;
+        }
+
+        .receipt-items-table,
+        .receipt-items-table tbody,
+        .receipt-items-table tr,
+        .receipt-items-table td {
+            display: block;
+            width: 100%;
+        }
+
+            .receipt-items-table tr {
+                border: 1px solid var(--bs-border-color);
+                border-radius: 0.5rem;
+                padding: 0.75rem;
+                margin-bottom: 0.75rem;
+                background-color: #ffffff;
+            }
+
+            .receipt-items-table td {
+                border: 0;
+                padding: 0 0 0.75rem 0;
+            }
+
+                .receipt-items-table td:last-child {
+                    padding-bottom: 0;
+                }
+
+                .receipt-items-table td::before {
+                    content: attr(data-label);
+                    display: block;
+                    margin-bottom: 0.25rem;
+                    font-size: 0.78rem;
+                    font-weight: 600;
+                    color: var(--bs-secondary-color);
+                }
+
+                .receipt-items-table td[data-label="Action"] {
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                }
+
+                    .receipt-items-table td[data-label="Action"]::before {
+                        margin-right: auto;
+                        margin-bottom: 0;
+                    }
+
+            .receipt-items-table .item-quantity,
+            .receipt-items-table .item-unit-price,
+            .receipt-items-table .item-total-price {
+                text-align: left;
+            }
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.cropper-view-box {
+    outline: 3px solid #0d6efd;
+    outline-color: rgba(13, 110, 253, 0.95);
+}
+
+.cropper-line {
+    background-color: #0d6efd;
+    opacity: 0.95;
+}
+
+.cropper-point {
+    width: 18px;
+    height: 18px;
+    background-color: #0d6efd;
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    opacity: 1;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.35);
+}
+
+    .cropper-point.point-e,
+    .cropper-point.point-w {
+        margin-top: -9px;
+    }
+
+    .cropper-point.point-n,
+    .cropper-point.point-s {
+        margin-left: -9px;
+    }
+
+    .cropper-point.point-ne,
+    .cropper-point.point-nw,
+    .cropper-point.point-se,
+    .cropper-point.point-sw {
+        width: 22px;
+        height: 22px;
+    }
+
+    .cropper-point.point-ne {
+        right: -11px;
+        top: -11px;
+    }
+
+    .cropper-point.point-nw {
+        left: -11px;
+        top: -11px;
+    }
+
+    .cropper-point.point-se {
+        right: -11px;
+        bottom: -11px;
+    }
+
+    .cropper-point.point-sw {
+        left: -11px;
+        bottom: -11px;
+    }
+
+    .cropper-point.point-e {
+        right: -9px;
+    }
+
+    .cropper-point.point-w {
+        left: -9px;
+    }
+
+    .cropper-point.point-n {
+        top: -9px;
+    }
+
+    .cropper-point.point-s {
+        bottom: -9px;
+    }
+
+.cropper-face {
+    background-color: transparent;
+}
+
+.cropper-drag-box {
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 575.98px) {
+    .cropper-point {
+        width: 24px;
+        height: 24px;
+    }
+
+        .cropper-point.point-ne,
+        .cropper-point.point-nw,
+        .cropper-point.point-se,
+        .cropper-point.point-sw {
+            width: 28px;
+            height: 28px;
+        }
 }

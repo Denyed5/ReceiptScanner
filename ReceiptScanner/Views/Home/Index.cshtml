@@ -1,8 +1,172 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-12 col-lg-6">
+                <h1 class="display-5 fw-bold mb-3">
+                    Scan receipts. Track expenses.
+                </h1>
+
+                <p class="lead text-muted mb-4">
+                    Upload receipt images, extract purchase data with OCR, save your expenses, and view spending summaries in one place.
+                </p>
+
+                <div class="d-grid d-sm-flex gap-2">
+                    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary btn-lg">
+                        Create account
+                    </a>
+
+                    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-primary btn-lg">
+                        Login
+                    </a>
+
+                    <a asp-controller="Receipt" asp-action="Upload" class="btn btn-outline-secondary btn-lg">
+                        Try scanner
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+                <div class="border rounded-3 p-3 bg-light">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <strong>Receipt preview</strong>
+                        <span class="badge bg-success">OCR ready</span>
+                    </div>
+
+                    <div class="bg-white border rounded-3 p-3">
+                        <div class="mb-2 fw-semibold">Supermarket Example</div>
+
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span>Milk</span>
+                            <span>2.40 лв.</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span>Bread</span>
+                            <span>1.80 лв.</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span>Cheese</span>
+                            <span>6.90 лв.</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between pt-3 fw-bold">
+                            <span>Total</span>
+                            <span>11.10 лв.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="border rounded-3 p-4 h-100 bg-white">
+                    <h2 class="h5">OCR scanning</h2>
+                    <p class="text-muted mb-0">
+                        Extract text from receipt images using OCR processing.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="border rounded-3 p-4 h-100 bg-white">
+                    <h2 class="h5">Receipt details</h2>
+                    <p class="text-muted mb-0">
+                        Detect vendor, date, totals, and purchased items.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="border rounded-3 p-4 h-100 bg-white">
+                    <h2 class="h5">Categories</h2>
+                    <p class="text-muted mb-0">
+                        Organize products and expenses by category.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="border rounded-3 p-4 h-100 bg-white">
+                    <h2 class="h5">Analytics</h2>
+                    <p class="text-muted mb-0">
+                        View monthly spending, totals, and category charts.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-12 col-lg-5">
+                <h2 class="h1 mb-3">Expense overview</h2>
+                <p class="text-muted">
+                    After receipts are saved, the dashboard can show spending statistics and charts.
+                </p>
+            </div>
+
+            <div class="col-12 col-lg-7">
+                <div class="row g-3">
+                    <div class="col-12 col-sm-4">
+                        <div class="border rounded-3 p-3 text-center h-100">
+                            <div class="text-muted small">This month</div>
+                            <div class="h4 mb-0">248.60 лв.</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-4">
+                        <div class="border rounded-3 p-3 text-center h-100">
+                            <div class="text-muted small">Receipts</div>
+                            <div class="h4 mb-0">18</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-4">
+                        <div class="border rounded-3 p-3 text-center h-100">
+                            <div class="text-muted small">Top category</div>
+                            <div class="h4 mb-0">Food</div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="border rounded-3 p-4">
+                            <div class="d-flex align-items-end gap-2" style="height: 180px;">
+                                <div class="bg-primary rounded-top flex-fill" style="height: 45%;"></div>
+                                <div class="bg-primary rounded-top flex-fill" style="height: 70%;"></div>
+                                <div class="bg-primary rounded-top flex-fill" style="height: 55%;"></div>
+                                <div class="bg-primary rounded-top flex-fill" style="height: 85%;"></div>
+                                <div class="bg-primary rounded-top flex-fill" style="height: 60%;"></div>
+                                <div class="bg-primary rounded-top flex-fill" style="height: 75%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container text-center">
+        <h2 class="h1 mb-3">Start organizing your receipts</h2>
+        <p class="text-muted mb-4">
+            Create an account to save scanned receipts and build your personal expense history.
+        </p>
+
+        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary btn-lg">
+            Create account
+        </a>
+    </div>
+</section>

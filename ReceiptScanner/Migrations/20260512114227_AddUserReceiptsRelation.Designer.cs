@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ReceiptScanner.Data;
 
@@ -11,9 +12,11 @@ using ReceiptScanner.Data;
 namespace ReceiptScanner.Migrations
 {
     [DbContext(typeof(ReceiptScannerContext))]
-    partial class ReceiptScannerContextModelSnapshot : ModelSnapshot
+    [Migration("20260512114227_AddUserReceiptsRelation")]
+    partial class AddUserReceiptsRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

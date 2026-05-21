@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Saved";
+}
+
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6 text-center">
+                <div class="border rounded-3 p-4 p-md-5">
+                    <div class="badge bg-success mb-3">Saved</div>
+
+                    <h1 class="h2 fw-bold mb-3">Receipt saved successfully</h1>
+
+                    <p class="text-muted mb-4">
+                        The extracted receipt information has been saved to your account.
+                    </p>
+
+                    <div class="d-grid d-sm-flex justify-content-sm-center gap-2">
+                        <a asp-controller="Receipt" asp-action="Upload" class="btn btn-primary btn-lg">
+                            Scan another receipt
+                        </a>
+
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                            Back to home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,7 +1,6 @@
 ﻿using ReceiptScanner.Models;
 using Tesseract;
 
-
 namespace ReceiptScanner.Services
 {
     public class OcrService
@@ -13,28 +12,43 @@ namespace ReceiptScanner.Services
             _env = env;
         }
 
-        public async Task<ReceiptResultVM> ReadTextAsync(Stream imageStream, string language = "bul")
+        public async Task<ReceiptModel> ReadTextAsync(byte[] imageBytes, string language = "bul+eng")
         {
-            ReceiptResultVM result = new();
+            ReceiptModel result = new();
             var tessDataPath = Path.Combine(_env.ContentRootPath, "tessdata");
-
-            using var ms = new MemoryStream();
-            await imageStream.CopyToAsync(ms);
-            var bytes = ms.ToArray();
 
             using var engine = new TesseractEngine(tessDataPath, language, EngineMode.Default);
 
-            engine.DefaultPageSegMode = PageSegMode.SingleColumn; // SparseText/SingleColumn works best
+            engine.DefaultPageSegMode = PageSegMode.SingleColumn;
+            engine.SetVariable("user_defined_dpi", "300");
 
-            using var pix = Pix.LoadFromMemory(bytes);
+            using var pix = Pix.LoadFromMemory(imageBytes);
             using var page = engine.Process(pix);
+
             var text = page.GetText();
             var confidence = page.GetMeanConfidence();
 
+            text = CleanGarbage(text);
+
             result.RawText = text;
-            result.Confidence = confidence * 100;
 
             return result;
+        }
+        private string CleanGarbage(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return "";
+
+            var lines = text.Split('\n');
+
+            var cleaned = lines
+                .Select(l => l.Trim())
+                .Where(l =>
+                    l.Length > 2 &&
+                    l.Count(char.IsLetterOrDigit) > 2)
+                .ToList();
+
+            return string.Join("\n", cleaned);
         }
     }
 }

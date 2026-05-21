@@ -1,25 +1,81 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ReceiptScanner.Data;
 using ReceiptScanner.Models;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace ReceiptScanner.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly ReceiptScannerContext _context;
+
+        public HomeController(ReceiptScannerContext context)
+        {
+            _context = context;
+        }
+
         public IActionResult Index()
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction(nameof(Dashboard));
+            }
+
             return View();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Dashboard()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return RedirectToPage("/Account/Login", new { area = "Identity" });
+            }
+
+            var receipts = await _context.Receipts
+                .Include(r => r.Items)
+                .Where(r => r.UserId == userId)
+                .OrderByDescending(r => r.Date)
+                .ToListAsync();
+
+            var monthStart = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+
+            var categoryTotals = receipts
+                .SelectMany(r => r.Items)
+                .Where(i => !string.IsNullOrWhiteSpace(i.Category))
+                .GroupBy(i => i.Category)
+                .OrderByDescending(g => g.Sum(i => i.TotalPrice))
+                .ToDictionary(g => g.Key, g => g.Sum(i => i.TotalPrice));
+
+            var monthlyTotals = receipts
+                .Where(r => r.Date.HasValue)
+                .GroupBy(r => r.Date!.Value.ToString("MMM yyyy"))
+                .ToDictionary(g => g.Key, g => g.Sum(r => r.TotalBGN ?? 0));
+
+            var model = new DashboardViewModel
+            {
+                ReceiptCount = receipts.Count,
+                TotalSpentBGN = receipts.Sum(r => r.TotalBGN ?? 0),
+                ThisMonthSpentBGN = receipts
+                    .Where(r => r.Date.HasValue && r.Date.Value >= monthStart)
+                    .Sum(r => r.TotalBGN ?? 0),
+                TopCategory = categoryTotals.FirstOrDefault().Key ?? "No data",
+                RecentReceipts = receipts.Take(5).ToList(),
+                CategoryTotals = categoryTotals,
+                MonthlyTotals = monthlyTotals
+            };
+
+            return View(model);
         }
 
         public IActionResult Privacy()
         {
             return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

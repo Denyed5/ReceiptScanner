@@ -5,15 +5,13 @@ namespace ReceiptScanner.Services
 {
     public class ReceiptParserService
     {
-        // ------------------------------- Извличане на търговец -------------------------------- //
-
-        // Търсени думи
         private static readonly string[] LegalKeywordsVendor =
-        {   "ЕООД", "ООД", "АД",
+        {
+            "ЕООД", "ООД", "АД",
             "ЕТ", "КД", "Пацони",
-            "Кауфланд", "Лидл" };
+            "Кауфланд", "Лидл"
+        };
 
-        // Избягвани думи
         private static readonly string[] IgnoreKeywordsVendor =
         {
             "БУЛСТАТ", "ЕИК", "ДДС", "ЗДДС", "BG",
@@ -28,19 +26,27 @@ namespace ReceiptScanner.Services
             "TOTAL", "ТОТАЛ"
         };
 
-        private static readonly Regex PriceRegex =
-            new Regex(@"\d+[.,]\d{2}\s*", RegexOptions.Compiled);
+        private static readonly string[] LegalKeywordsTotalBGN =
+        {
+            "ЛВ", "BGN", "ЛЕВА", "LV", "LEVA", "ЛB"
+        };
+
+        private static readonly string[] LegalKeywordsTotalEUR =
+        {
+            "ЕВРО", "EUR", "EURO"
+        };
 
         private static readonly Regex QuantityRegex =
-            new Regex(@"\d+[.,]\d+\s*x\s*\d+[.,]\d+", RegexOptions.Compiled);
+            new Regex(@"\d+[.,]\d+\s*x\s*\d+[.,]\d+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+        private static readonly Regex PriceRegex =
+            new Regex(@"\d+[.,]\d{2}", RegexOptions.Compiled);
 
-        // Извлича реда с името на търговеца
         public string? ExtractVendorLine(string rawText, int headerLinesCount)
         {
             var lines = GetCleanLines(rawText)
-                            .Take(headerLinesCount)
-                            .ToList();
+                .Take(headerLinesCount)
+                .ToList();
 
             var cleaned = lines
                 .Where(l => !ContainsAny(l, IgnoreKeywordsVendor))
@@ -55,10 +61,10 @@ namespace ReceiptScanner.Services
             if (!string.IsNullOrWhiteSpace(legal))
                 return legal;
 
-            return "Не може да бъде извлечен.";
+            return null;
         }
 
-        private static List<string> GetCleanLines(string text)
+        public List<string> GetCleanLines(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
                 return new List<string>();
@@ -73,90 +79,135 @@ namespace ReceiptScanner.Services
                 .ToList();
         }
 
-        // Функция за проверка дали даден ред съдържа някоя от търсените ключови думи
         private static bool ContainsAny(string line, string[] keywords)
         {
-            foreach (var k in keywords)
+            foreach (var keyword in keywords)
             {
-                if (line.Contains(k, StringComparison.OrdinalIgnoreCase))
+                if (line.Contains(keyword, StringComparison.OrdinalIgnoreCase))
                     return true;
             }
+
             return false;
         }
 
-        // ------------------------------- Извличане на датата -------------------------------- //
-
-        public string? ExtractDateTime(string rawText)
+        public DateTime? ExtractDateTime(string rawText)
         {
-            var regex = new Regex(@"\d{1,2}[./-]\d{1,2}[./-]\d{2,4}(\s+\d{1,2}:\d{2})?|\d{4}[./-]\d{1,2}[./-]\d{1,2}(\s+\d{1,2}:\d{2})?"); // regex за формата ДД.ММ.ГГГГ, ДД/ММ/ГГГГ, ДД-ММ-ГГГГ, ГГГГ.ММ.ДД, ГГГГ/ММ/ДД, ГГГГ-ММ-ДД
+            var regex = new Regex(@"\d{1,2}[./-]\d{1,2}[./-]\d{2,4}(\s+\d{1,2}:\d{2}(:\d{2})?)?");
             var lines = GetCleanLines(rawText);
-            string result;
+            var culture = new System.Globalization.CultureInfo("bg-BG");
 
             foreach (var line in lines)
             {
                 var match = regex.Match(line);
+
                 if (match.Success)
                 {
-                    return result = match.ToString();
+                    var dateStr = match.Value;
+
+                    if (DateTime.TryParse(dateStr, culture, System.Globalization.DateTimeStyles.None, out var dt))
+                        return dt;
                 }
             }
 
-            return "Не може да бъде извлечена.";
+            return null;
         }
 
-
-        // ------------------------------- Извличане на общата сума -------------------------------- //
-
-        public string? ExtractTotalSum(string rawText)
+        public decimal? ExtractTotalSumBGN(string rawText)
         {
             var lines = GetCleanLines(rawText);
+            var exactCurrencyTotal = ExtractTotalByCurrency(lines, LegalKeywordsTotalBGN);
 
-            var result = lines
-                .FirstOrDefault(l => ContainsAny(l, LegalKeywordsTotal));
+            if (exactCurrencyTotal.HasValue)
+                return exactCurrencyTotal;
 
-            if (!string.IsNullOrWhiteSpace(result))
+            return ExtractTotalWithoutCurrency(lines);
+        }
+
+        public decimal? ExtractTotalSumEUR(string rawText)
+        {
+            var lines = GetCleanLines(rawText);
+            return ExtractTotalByCurrency(lines, LegalKeywordsTotalEUR);
+        }
+
+        private static decimal? ExtractTotalByCurrency(List<string> lines, string[] currencyKeywords)
+        {
+            foreach (var line in lines)
+            {
+                if (!ContainsAny(line, LegalKeywordsTotal) || !ContainsAny(line, currencyKeywords))
+                    continue;
+
+                var prices = PriceRegex.Matches(line)
+                    .Select(m => ParsePrice(m.Value))
+                    .Where(v => v.HasValue)
+                    .Select(v => v!.Value)
+                    .ToList();
+
+                if (prices.Count > 0)
+                    return prices[^1];
+            }
+
+            return null;
+        }
+
+        private static decimal? ExtractTotalWithoutCurrency(List<string> lines)
+        {
+            foreach (var line in lines)
+            {
+                if (!ContainsAny(line, LegalKeywordsTotal))
+                    continue;
+
+                if (ContainsAny(line, LegalKeywordsTotalEUR))
+                    continue;
+
+                var prices = PriceRegex.Matches(line)
+                    .Select(m => ParsePrice(m.Value))
+                    .Where(v => v.HasValue)
+                    .Select(v => v!.Value)
+                    .ToList();
+
+                if (prices.Count > 0)
+                    return prices[^1];
+            }
+
+            return null;
+        }
+
+        private static decimal? ParsePrice(string value)
+        {
+            if (decimal.TryParse(
+                value.Replace(',', '.'),
+                System.Globalization.NumberStyles.Any,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out decimal result))
+            {
                 return result;
+            }
 
-
-            return "Не може да бъде извлечена.";
+            return null;
         }
 
-        // ------------------------------- Извличане на покупки -------------------------------- //
-
-        public List<ReceiptItem> ExtractPurchases(string rawText)
+        public List<RItemModel> ExtractPurchases(string rawText)
         {
             var lines = GetCleanLines(rawText);
 
-            int totalIndex = lines.FindIndex(l =>
-                ContainsAny(l, LegalKeywordsTotal));
+            int totalIndex = lines.FindIndex(l => ContainsAny(l, LegalKeywordsTotal));
+            if (totalIndex < 0) return new List<RItemModel>();
 
-            if (totalIndex < 0)
-                return new List<ReceiptItem>();
-
-            int startIndex = lines.FindIndex(l =>
-                PriceRegex.IsMatch(l) &&
-                l.Any(char.IsLetter));
-
-            if (startIndex < 0 || startIndex >= totalIndex)
-                return new List<ReceiptItem>();
-
-            var items = new List<ReceiptItem>();
+            var items = new List<RItemModel>();
 
             decimal tempQty = 1;
             decimal tempUnitPrice = 0;
             bool hasQuantity = false;
 
-            for (int i = startIndex; i < totalIndex; i++)
+            for (int i = 0; i < totalIndex; i++)
             {
                 var line = lines[i];
 
-                // Quantity line
                 if (QuantityRegex.IsMatch(line))
                 {
                     var numbers = Regex.Matches(line, @"\d+[.,]\d+")
-                                       .Select(m => decimal.Parse(
-                                           m.Value.Replace(',', '.')))
-                                       .ToList();
+                        .Select(m => decimal.Parse(m.Value.Replace(',', '.'), System.Globalization.CultureInfo.InvariantCulture))
+                        .ToList();
 
                     if (numbers.Count == 2)
                     {
@@ -168,30 +219,34 @@ namespace ReceiptScanner.Services
                     continue;
                 }
 
-                // Product line
-                if (PriceRegex.IsMatch(line))
+                var priceMatch = PriceRegex.Match(line);
+
+                if (!priceMatch.Success)
+                    continue;
+
+                decimal totalPrice = decimal.Parse(
+                    priceMatch.Value.Replace(',', '.'),
+                    System.Globalization.CultureInfo.InvariantCulture);
+
+                string name = Regex.Replace(line, @"\d+[.,]\d{2}.*$", "").Trim();
+
+                if (string.IsNullOrWhiteSpace(name) || name.Length < 2)
+                    continue;
+
+                items.Add(new RItemModel
                 {
-                    var match = PriceRegex.Match(line);
+                    Name = name,
+                    Quantity = hasQuantity ? tempQty : 1,
+                    UnitPrice = hasQuantity ? tempUnitPrice : totalPrice,
+                    TotalPrice = totalPrice,
+                    IsWeighted = hasQuantity
+                });
 
-                    decimal totalPrice = decimal.Parse(
-                        match.Value.Replace(',', '.'));
-
-                    string name = line.Substring(0, match.Index).Trim();
-
-                    items.Add(new ReceiptItem
-                    {
-                        Name = name,
-                        Quantity = hasQuantity ? tempQty : 1,
-                        UnitPrice = hasQuantity ? tempUnitPrice : totalPrice,
-                        TotalPrice = totalPrice,
-                        IsWeighted = hasQuantity
-                    });
-
-                    hasQuantity = false;
-                    tempQty = 1;
-                    tempUnitPrice = 0;
-                }
+                hasQuantity = false;
+                tempQty = 1;
+                tempUnitPrice = 0;
             }
+
             return items;
         }
     }
