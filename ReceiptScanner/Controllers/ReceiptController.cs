@@ -12,7 +12,7 @@ namespace ReceiptScanner.Controllers
     public class ReceiptController : Controller
     {
         private const decimal EurToBgnRate = 1.95583m;
-        private const string UnsupportedImageMessage = "Unsupported image format. Please upload a JPG, PNG, or BMP receipt image.";
+        private const string UnsupportedImageMessage = "Неподдържан формат. Системата поддържа само JPG, PNG и BMP изображения.";
 
         private static readonly HashSet<string> SupportedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -33,14 +33,16 @@ namespace ReceiptScanner.Controllers
         private readonly ReceiptParserService _parser;
         private readonly ImagePreprocessingService _preprocessing;
         private readonly ReceiptScannerContext _context;
-
+        private readonly CategoryDetectionService _categoryDetectionService;
         public ReceiptController(OcrService ocr, ReceiptParserService parser,
-                                 ImagePreprocessingService preprocessing, ReceiptScannerContext context)
+                                 ImagePreprocessingService preprocessing, ReceiptScannerContext context, 
+                                 CategoryDetectionService categoryDetectionService)
         {
             _ocr = ocr;
             _parser = parser;
             _preprocessing = preprocessing;
             _context = context;
+            _categoryDetectionService = categoryDetectionService;
         }
 
         [HttpGet]
@@ -160,12 +162,12 @@ namespace ReceiptScanner.Controllers
 
             if (!model.TotalBGN.HasValue)
             {
-                ModelState.AddModelError(nameof(ReceiptModel.TotalBGN), "Total in BGN is required.");
+                ModelState.AddModelError(nameof(ReceiptModel.TotalBGN), "Обща сума в лева е задължителна.");
             }
 
             if (!model.TotalEUR.HasValue)
             {
-                ModelState.AddModelError(nameof(ReceiptModel.TotalEUR), "Total in EUR is required.");
+                ModelState.AddModelError(nameof(ReceiptModel.TotalEUR), "Обща сума в евро е задължителна.");
             }
 
             if (!ModelState.IsValid)
@@ -253,7 +255,7 @@ namespace ReceiptScanner.Controllers
         {
             byte[] imageBytes;
 
-            if (!string.IsNullOrEmpty(croppedImage))
+            if (!string.IsNullOrEmpty(croppedImage)) 
             {
                 try
                 {
@@ -262,7 +264,7 @@ namespace ReceiptScanner.Controllers
                 }
                 catch (Exception ex) when (ex is FormatException or IndexOutOfRangeException)
                 {
-                    return UploadViewWithError(model, "The cropped image could not be read. Please choose the image again.");
+                    return UploadViewWithError(model, "Изображението не може да бъде прочетено.");
                 }
             }
             else
@@ -321,6 +323,20 @@ namespace ReceiptScanner.Controllers
             decimal? totalBGN = _parser.ExtractTotalSumBGN(result.RawText);
             decimal? totalEUR = _parser.ExtractTotalSumEUR(result.RawText);
             List<RItemModel> items = _parser.ExtractPurchases(result.RawText);
+
+            foreach (var item in items)
+            {
+                var detection =
+                    await _categoryDetectionService
+                        .DetectCategoryAsync(item.Name);
+
+                item.CategoryId =
+                    detection.CategoryId;
+
+                item.IsCategorySuggested =
+                    detection.IsSuggested;
+            }
+
             List<string>? cleanLines = _parser.GetCleanLines(result.RawText);
 
             result.RawTextLines = cleanLines;

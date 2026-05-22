@@ -28,21 +28,21 @@
                         <li class="nav-item">
                             @if (User.Identity?.IsAuthenticated == true)
                             {
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Dashboard">
-                                    Dashboard
+                                <a class="nav-link" asp-area="" asp-controller="Dashboard" asp-action="Dashboard">
+                                    Табло
                                 </a>
                             }
                             else
                             {
                                 <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
-                                    Home
+                                    Начална страница
                                 </a>
                             }
                         </li>
 
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Receipt" asp-action="Upload">
-                                Upload Receipt
+                                Качи бележка
                             </a>
                         </li>
 
@@ -50,7 +50,16 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="" asp-controller="Receipt" asp-action="History">
-                                    History
+                                    История
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-area=""
+                                   asp-controller="Dashboard"
+                                   asp-action="Analytics">
+                                    Анализи
                                 </a>
                             </li>
                         }
@@ -66,18 +75,18 @@
                             <form class="m-0" asp-area="Identity" asp-page="/Account/Logout"
                                   asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                                 <button type="submit" class="btn btn-outline-secondary btn-sm w-100">
-                                    Logout
+                                    Изход
                                 </button>
                             </form>
                         }
                         else
                         {
                             <a class="btn btn-outline-primary btn-sm" asp-area="Identity" asp-page="/Account/Login">
-                                Login
+                                Вход
                             </a>
 
                             <a class="btn btn-primary btn-sm" asp-area="Identity" asp-page="/Account/Register">
-                                Create account
+                                Регистрация
                             </a>
                         }
                     </div>
@@ -97,6 +106,7 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/cropper/cropper.min.js"></script>

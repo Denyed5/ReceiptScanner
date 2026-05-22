@@ -18,7 +18,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddScoped<ReceiptScanner.Services.OcrService>();
 builder.Services.AddScoped<ReceiptScanner.Services.ReceiptParserService>();
 builder.Services.AddScoped<ImagePreprocessingService>();
-
+builder.Services.AddScoped<CategoryDetectionService>();
 
 var app = builder.Build();
 

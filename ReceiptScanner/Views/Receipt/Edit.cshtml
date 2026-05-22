@@ -1,7 +1,7 @@
 ﻿@model ReceiptScanner.Models.ReceiptModel
 
 @{
-    ViewData["Title"] = "Edit Receipt";
+    ViewData["Title"] = "Редактиране на касова бележка";
 }
 
 <section class="py-4 py-lg-5">
@@ -14,18 +14,23 @@
 
             <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
                 <div>
-                    <h1 class="h2 fw-bold mb-2">Edit receipt</h1>
+                    <h1 class="h2 fw-bold mb-2">Редактиране на касова бележка</h1>
                     <p class="text-muted mb-0">
-                        Update the saved receipt summary and item list.
+                        Актуализирай запазеното обобщение и списъка с продукти.
                     </p>
                 </div>
 
-                <div class="d-grid d-md-flex gap-2">
-                    <a asp-controller="Receipt" asp-action="Details" asp-route-id="@Model.ReceiptId" class="btn btn-outline-secondary btn-lg">
-                        Cancel
+                <div class="d-flex gap-2 align-items-end pb-1">
+                    <a asp-controller="Receipt"
+                       asp-action="Details"
+                       asp-route-id="@Model.ReceiptId"
+                       class="btn btn-outline-secondary px-3 py-2">
+                        Отказ
                     </a>
-                    <button type="submit" class="btn btn-success btn-lg">
-                        Save changes
+
+                    <button type="submit"
+                            class="btn btn-success px-3 py-2">
+                        Запази промените
                     </button>
                 </div>
             </div>
@@ -35,28 +40,28 @@
             <div class="row g-4">
                 <div class="col-12 col-lg-4">
                     <div class="border rounded-3 p-3 p-md-4 h-100">
-                        <h2 class="h5 fw-semibold mb-3">Receipt summary</h2>
+                        <h2 class="h5 fw-semibold mb-3">Обобщение на касовата бележка</h2>
 
                         <div class="mb-3">
-                            <label asp-for="VendorName" class="form-label">Vendor</label>
+                            <label asp-for="VendorName" class="form-label">Търговец</label>
                             <input asp-for="VendorName" class="form-control" />
                             <span asp-validation-for="VendorName" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Date" class="form-label">Date</label>
+                            <label asp-for="Date" class="form-label">Дата</label>
                             <input asp-for="Date" class="form-control" />
                             <span asp-validation-for="Date" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="TotalBGN" class="form-label">Total in BGN</label>
+                            <label asp-for="TotalBGN" class="form-label">Общо в лева</label>
                             <input asp-for="TotalBGN" class="form-control" />
                             <span asp-validation-for="TotalBGN" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-0">
-                            <label asp-for="TotalEUR" class="form-label">Total in EUR</label>
+                            <label asp-for="TotalEUR" class="form-label">Общо в евро</label>
                             <input asp-for="TotalEUR" class="form-control" />
                             <span asp-validation-for="TotalEUR" class="text-danger small"></span>
                         </div>
@@ -67,12 +72,16 @@
                     <div class="border rounded-3 p-3 p-md-4 h-100">
                         <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mb-3">
                             <div>
-                                <h2 class="h5 fw-semibold mb-1">Purchased items</h2>
-                                <p class="text-muted small mb-0">Add, remove, or correct saved receipt items.</p>
+                                <h2 class="h5 fw-semibold mb-1">Закупени продукти</h2>
+                                <p class="text-muted small mb-0">
+                                    Добавяй, премахвай или коригирай запазените продукти.
+                                </p>
                             </div>
 
-                            <button id="addItemBtn" type="button" class="btn btn-outline-primary">
-                                Add item
+                            <button id="addItemBtn"
+                                    type="button"
+                                    class="btn btn-outline-primary">
+                                Добави продукт
                             </button>
                         </div>
 
@@ -86,14 +95,15 @@
                                     <col class="item-category-col" />
                                     <col class="item-action-col" />
                                 </colgroup>
+
                                 <thead>
                                     <tr>
-                                        <th>Product</th>
-                                        <th>Qty</th>
-                                        <th>Unit price</th>
-                                        <th>Total</th>
-                                        <th>Category</th>
-                                        <th class="text-end">Action</th>
+                                        <th>Продукт</th>
+                                        <th>Количество</th>
+                                        <th>Ед. цена</th>
+                                        <th>Общо</th>
+                                        <th>Категория</th>
+                                        <th class="text-end">Действие</th>
                                     </tr>
                                 </thead>
 
@@ -101,29 +111,37 @@
                                     @for (int i = 0; i < Model.Items.Count; i++)
                                     {
                                         <tr class="receipt-item-row">
-                                            <td data-label="Product">
+                                            <td data-label="Продукт">
                                                 <input type="hidden" asp-for="Items[i].ItemId" />
                                                 <input type="hidden" asp-for="Items[i].ReceiptId" />
                                                 <input asp-for="Items[i].Name" class="form-control item-name" />
                                             </td>
-                                            <td data-label="Qty">
+
+                                            <td data-label="Количество">
                                                 <input asp-for="Items[i].Quantity" class="form-control item-quantity" />
                                             </td>
-                                            <td data-label="Unit price">
+
+                                            <td data-label="Ед. цена">
                                                 <input asp-for="Items[i].UnitPrice" class="form-control item-unit-price" />
                                             </td>
-                                            <td data-label="Total">
+
+                                            <td data-label="Общо">
                                                 <input asp-for="Items[i].TotalPrice" class="form-control item-total-price" />
                                             </td>
-                                            <td data-label="Category">
+
+                                            <td data-label="Категория">
                                                 <select asp-for="Items[i].CategoryId"
                                                         class="form-select item-category"
                                                         asp-items="@(new SelectList(ViewBag.Categories, "CategoryId", "Name"))">
-                                                    <option value="">Select category</option>
+                                                    <option value="">Избери категория</option>
                                                 </select>
                                             </td>
-                                            <td data-label="Action" class="text-end">
-                                                <button type="button" class="btn btn-outline-danger btn-sm remove-item-btn" aria-label="Remove item" title="Remove item">
+
+                                            <td data-label="Действие" class="text-end">
+                                                <button type="button"
+                                                        class="btn btn-outline-danger btn-sm remove-item-btn"
+                                                        aria-label="Премахни продукт"
+                                                        title="Премахни продукт">
                                                     &times;
                                                 </button>
                                             </td>
@@ -133,19 +151,24 @@
                             </table>
                         </div>
 
-                        <div id="emptyItemsMessage" class="alert alert-warning mt-3 mb-0 @(Model.Items.Count > 0 ? "d-none" : "")">
-                            No receipt items are currently listed. Add an item manually if needed.
+                        <div id="emptyItemsMessage"
+                             class="alert alert-warning mt-3 mb-0 @(Model.Items.Count > 0 ? "d-none" : "")">
+                            В момента няма добавени продукти. При нужда добави продукт ръчно.
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="d-grid d-md-flex justify-content-md-end gap-2 mt-4">
-                <a asp-controller="Receipt" asp-action="Details" asp-route-id="@Model.ReceiptId" class="btn btn-outline-secondary btn-lg">
-                    Cancel
+                <a asp-controller="Receipt"
+                   asp-action="Details"
+                   asp-route-id="@Model.ReceiptId"
+                   class="btn btn-outline-secondary btn-lg">
+                    Отказ
                 </a>
+
                 <button type="submit" class="btn btn-success btn-lg">
-                    Save changes
+                    Запази промените
                 </button>
             </div>
         }
@@ -154,23 +177,27 @@
 
 <template id="itemRowTemplate">
     <tr class="receipt-item-row">
-        <td data-label="Product">
+        <td data-label="Продукт">
             <input type="hidden" data-field="ItemId" value="" />
             <input type="hidden" data-field="ReceiptId" value="" />
             <input data-field="Name" class="form-control item-name" value="" />
         </td>
-        <td data-label="Qty">
+
+        <td data-label="Количество">
             <input data-field="Quantity" class="form-control item-quantity" value="1" />
         </td>
-        <td data-label="Unit price">
+
+        <td data-label="Ед. цена">
             <input data-field="UnitPrice" class="form-control item-unit-price" value="0.00" />
         </td>
-        <td data-label="Total">
+
+        <td data-label="Общо">
             <input data-field="TotalPrice" class="form-control item-total-price" value="0.00" />
         </td>
-        <td data-label="Category">
+
+        <td data-label="Категория">
             <select data-field="CategoryId" class="form-select item-category">
-                <option value="">Select category</option>
+                <option value="">Избери категория</option>
 
                 @foreach (var category in ViewBag.Categories)
                 {
@@ -178,8 +205,12 @@
                 }
             </select>
         </td>
-        <td data-label="Action" class="text-end">
-            <button type="button" class="btn btn-outline-danger btn-sm remove-item-btn" aria-label="Remove item" title="Remove item">
+
+        <td data-label="Действие" class="text-end">
+            <button type="button"
+                    class="btn btn-outline-danger btn-sm remove-item-btn"
+                    aria-label="Премахни продукт"
+                    title="Премахни продукт">
                 &times;
             </button>
         </td>

@@ -1,22 +1,22 @@
 ﻿@model ReceiptScanner.Models.DashboardViewModel
 
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Табло";
 }
 
 <section class="py-4 py-lg-5">
     <div class="container">
         <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
             <div>
-                <h1 class="h2 fw-bold mb-2">Dashboard</h1>
+                <h1 class="h2 fw-bold mb-2">Табло</h1>
                 <p class="text-muted mb-0">
-                    Overview of your saved receipts and spending.
+                    Преглед на запазените касови бележки и разходи.
                 </p>
             </div>
 
             <div class="d-grid d-md-block">
                 <a asp-controller="Receipt" asp-action="Upload" class="btn btn-primary btn-lg">
-                    Scan receipt
+                    Качи касова бележка
                 </a>
             </div>
         </div>
@@ -24,7 +24,7 @@
         <div class="row g-3 mb-4">
             <div class="col-12 col-sm-6 col-xl-3">
                 <div class="border rounded-3 p-3 h-100">
-                    <div class="text-muted small">Total spent</div>
+                    <div class="text-muted small">Общо похарчено</div>
                     <div class="h3 mb-0">@Model.TotalSpentBGN.ToString("0.00") лв.</div>
                     <div class="h3 mb-0">@Model.TotalSpentEUR.ToString("0.00") евро</div>
                 </div>
@@ -32,7 +32,7 @@
 
             <div class="col-12 col-sm-6 col-xl-3">
                 <div class="border rounded-3 p-3 h-100">
-                    <div class="text-muted small">This month</div>
+                    <div class="text-muted small">Този месец</div>
                     <div class="h3 mb-0">@Model.ThisMonthSpentBGN.ToString("0.00") лв.</div>
                     <div class="h3 mb-0">@Model.ThisMonthSpentEUR.ToString("0.00") евро</div>
                 </div>
@@ -40,14 +40,14 @@
 
             <div class="col-12 col-sm-6 col-xl-3">
                 <div class="border rounded-3 p-3 h-100">
-                    <div class="text-muted small">Saved receipts</div>
+                    <div class="text-muted small">Запазени касови бележки</div>
                     <div class="h3 mb-0">@Model.ReceiptCount</div>
                 </div>
             </div>
 
             <div class="col-12 col-sm-6 col-xl-3">
                 <div class="border rounded-3 p-3 h-100">
-                    <div class="text-muted small">Top category</div>
+                    <div class="text-muted small">Най-популярна категория</div>
                     <div class="h3 mb-0">@Model.TopCategory</div>
                 </div>
             </div>
@@ -56,12 +56,12 @@
         @if (Model.ReceiptCount == 0)
         {
             <div class="border rounded-3 p-4 p-md-5 text-center">
-                <h2 class="h4 fw-semibold mb-2">No receipts yet</h2>
+                <h2 class="h4 fw-semibold mb-2">Все още няма касови бележки</h2>
                 <p class="text-muted mb-4">
-                    Scan your first receipt to start building your expense history.
+                    Сканирай първата си касова бележка, за да започнеш да изграждаш историята на разходите си.
                 </p>
                 <a asp-controller="Receipt" asp-action="Upload" class="btn btn-primary btn-lg">
-                    Scan your first receipt
+                    Сканирай първата си касова бележка
                 </a>
             </div>
         }
@@ -70,22 +70,22 @@
             <div class="row g-4">
                 <div class="col-12 col-lg-7">
                     <div class="border rounded-3 p-3 p-md-4 h-100">
-                        <h2 class="h5 fw-semibold mb-3">Recent receipts</h2>
+                        <h2 class="h5 fw-semibold mb-3">Последни касови бележки</h2>
 
                         <div class="table-responsive">
                             <table class="table align-middle mb-0">
                                 <thead>
                                     <tr>
-                                        <th>Vendor</th>
-                                        <th>Date</th>
-                                        <th class="text-end">Total</th>
+                                        <th>Търговец</th>
+                                        <th>Дата</th>
+                                        <th class="text-end">Общо</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var receipt in Model.RecentReceipts)
                                     {
                                         <tr>
-                                            <td>@(receipt.VendorName ?? "Unknown")</td>
+                                            <td>@(receipt.VendorName ?? "Неизвестен")</td>
                                             <td>@(receipt.Date?.ToString("dd.MM.yyyy") ?? "-")</td>
                                             <td class="text-end">@((receipt.TotalEUR ?? 0).ToString("0.00")) евро</td>
                                         </tr>
@@ -98,11 +98,11 @@
 
                 <div class="col-12 col-lg-5">
                     <div class="border rounded-3 p-3 p-md-4 h-100">
-                        <h2 class="h5 fw-semibold mb-3">Categories</h2>
+                        <h2 class="h5 fw-semibold mb-3">Категории</h2>
 
                         @if (Model.CategoryTotals.Count == 0)
                         {
-                            <p class="text-muted mb-0">No category data available yet.</p>
+                            <p class="text-muted mb-0">Все още няма налични данни за категории.</p>
                         }
                         else
                         {

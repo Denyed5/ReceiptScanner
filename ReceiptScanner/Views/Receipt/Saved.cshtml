@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Saved";
+    ViewData["Title"] = "Запазено";
 }
 
 <section class="py-5">
@@ -7,21 +7,27 @@
         <div class="row justify-content-center">
             <div class="col-12 col-md-8 col-lg-6 text-center">
                 <div class="border rounded-3 p-4 p-md-5">
-                    <div class="badge bg-success mb-3">Saved</div>
+                    <div class="badge bg-success mb-3">Запазено</div>
 
-                    <h1 class="h2 fw-bold mb-3">Receipt saved successfully</h1>
+                    <h1 class="h2 fw-bold mb-3">
+                        Касовата бележка беше запазена успешно
+                    </h1>
 
                     <p class="text-muted mb-4">
-                        The extracted receipt information has been saved to your account.
+                        Извлечената информация от касовата бележка беше запазена във вашия акаунт.
                     </p>
 
                     <div class="d-grid d-sm-flex justify-content-sm-center gap-2">
-                        <a asp-controller="Receipt" asp-action="Upload" class="btn btn-primary btn-lg">
-                            Scan another receipt
+                        <a asp-controller="Receipt"
+                           asp-action="Upload"
+                           class="btn btn-primary btn-lg">
+                            Сканирай друга касова бележка
                         </a>
 
-                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-lg">
-                            Back to home
+                        <a asp-controller="Home"
+                           asp-action="Index"
+                           class="btn btn-outline-secondary btn-lg">
+                            Обратно към началната страница
                         </a>
                     </div>
                 </div>

@@ -27,21 +27,37 @@
     }
 }
 
+/* =========================
+   RECEIPT TABLE
+========================= */
+
 .receipt-items-table {
-    min-width: 720px;
+    width: 100%;
+    min-width: 760px;
     table-layout: fixed;
 }
 
+    .receipt-items-table th {
+        white-space: nowrap;
+        font-size: 0.95rem;
+        vertical-align: middle;
+    }
+
+    .receipt-items-table td {
+        vertical-align: middle;
+    }
+
     .receipt-items-table .item-name-col {
-        width: 34%;
+        width: 28%;
     }
 
     .receipt-items-table .item-quantity-col {
-        width: 10%;
+        width: 12%;
     }
 
     .receipt-items-table .item-price-col {
-        width: 12%;
+        width: 16%;
+        min-width: 120px;
     }
 
     .receipt-items-table .item-category-col {
@@ -52,7 +68,8 @@
         width: 6%;
     }
 
-    .receipt-items-table input {
+    .receipt-items-table input,
+    .receipt-items-table select {
         min-width: 0;
     }
 
@@ -71,6 +88,8 @@
         font-weight: 600;
     }
 
+/*---SUGGESTED FIELDS---*/
+
 .suggested-field {
     background-color: #fff3cd;
     border-color: #ffda6a;
@@ -84,6 +103,8 @@
 .white-space-pre-wrap {
     white-space: pre-wrap;
 }
+
+/*---MOBILE TABLE---*/
 
 @media (max-width: 767.98px) {
     .receipt-items-table {
@@ -131,13 +152,13 @@
                     color: var(--bs-secondary-color);
                 }
 
-                .receipt-items-table td[data-label="Action"] {
+                .receipt-items-table td[data-label="Действие"] {
                     display: flex;
                     justify-content: flex-end;
                     align-items: center;
                 }
 
-                    .receipt-items-table td[data-label="Action"]::before {
+                    .receipt-items-table td[data-label="Действие"]::before {
                         margin-right: auto;
                         margin-bottom: 0;
                     }
@@ -148,6 +169,8 @@
                 text-align: left;
             }
 }
+
+/*---CROPPER---*/
 
 .cropper-view-box {
     outline: 3px solid #0d6efd;
