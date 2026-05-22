@@ -77,4 +77,26 @@
 
         return 'item-' + Date.now() + '-' + Math.random().toString(16).slice(2);
     }
+
+    document.addEventListener("click", function (e) {
+        if (!e.target.classList.contains("apply-total-btn"))
+            return;
+
+        const button = e.target;
+        const td = button.closest("td");
+
+        const input = td.querySelector(".item-total-price");
+
+        if (!input)
+            return;
+
+        input.value = button.dataset.total;
+
+        input.classList.remove("suggested-field");
+
+        const warning = button.closest(".form-text");
+        if (warning) {
+            warning.remove();
+        }
+    });
 });

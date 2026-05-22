@@ -12,6 +12,22 @@ namespace ReceiptScanner.Controllers
     public class ReceiptController : Controller
     {
         private const decimal EurToBgnRate = 1.95583m;
+        private const string UnsupportedImageMessage = "Unsupported image format. Please upload a JPG, PNG, or BMP receipt image.";
+
+        private static readonly HashSet<string> SupportedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".bmp"
+        };
+
+        private static readonly HashSet<string> SupportedImageContentTypes = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "image/jpeg",
+            "image/png",
+            "image/bmp"
+        };
 
         private readonly OcrService _ocr;
         private readonly ReceiptParserService _parser;
@@ -227,8 +243,15 @@ namespace ReceiptScanner.Controllers
 
             if (!string.IsNullOrEmpty(croppedImage))
             {
-                var base64Data = croppedImage.Split(',')[1];
-                imageBytes = Convert.FromBase64String(base64Data);
+                try
+                {
+                    var base64Data = croppedImage.Split(',', 2)[1];
+                    imageBytes = Convert.FromBase64String(base64Data);
+                }
+                catch (Exception ex) when (ex is FormatException or IndexOutOfRangeException)
+                {
+                    return UploadViewWithError(model, "The cropped image could not be read. Please choose the image again.");
+                }
             }
             else
             {
@@ -237,22 +260,42 @@ namespace ReceiptScanner.Controllers
                     return View(model);
                 }
 
+                if (!IsSupportedImageFile(model.File))
+                {
+                    return UploadViewWithError(model, UnsupportedImageMessage);
+                }
+
                 using var ms = new MemoryStream();
                 await model.File.CopyToAsync(ms);
                 imageBytes = ms.ToArray();
+            }
+
+            Mat decodedImage;
+            try
+            {
+                decodedImage = Cv2.ImDecode(imageBytes, ImreadModes.Color);
+            }
+            catch (OpenCVException)
+            {
+                return UploadViewWithError(model, "The selected file could not be loaded as an image. Please choose a different receipt image.");
+            }
+
+            using Mat image = decodedImage;
+            if (image.Empty())
+            {
+                return UploadViewWithError(model, "The selected file could not be loaded as an image. Please choose a different receipt image.");
             }
 
             byte[] finalBytes;
 
             if (model.UsePreprocessing)
             {
-                Mat image = Cv2.ImDecode(imageBytes, ImreadModes.Color);
-                var processed = _preprocessing.Preprocess(image);
+                using var processed = _preprocessing.Preprocess(image);
                 finalBytes = processed.ToBytes(".png");
             }
             else
             {
-                finalBytes = imageBytes;
+                finalBytes = image.ToBytes(".png");
             }
 
             var result = await _ocr.ReadText(finalBytes, model.Language);
@@ -350,6 +393,22 @@ namespace ReceiptScanner.Controllers
                 receipt.TotalBGN = Math.Round(receipt.TotalEUR.Value * EurToBgnRate, 2);
                 receipt.IsTotalBGNSuggested = true;
             }
+        }
+
+        private static bool IsSupportedImageFile(IFormFile file)
+        {
+            var extension = Path.GetExtension(file.FileName);
+            var hasSupportedExtension = SupportedImageExtensions.Contains(extension);
+            var hasSupportedContentType = !string.IsNullOrWhiteSpace(file.ContentType)
+                && SupportedImageContentTypes.Contains(file.ContentType);
+
+            return hasSupportedExtension || hasSupportedContentType;
+        }
+
+        private IActionResult UploadViewWithError(ReceiptUploadModel model, string message)
+        {
+            ViewBag.UploadErrorMessage = message;
+            return View("Upload", model);
         }
     }
 }

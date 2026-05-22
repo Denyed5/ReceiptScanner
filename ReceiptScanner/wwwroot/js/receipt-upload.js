@@ -1,5 +1,14 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     let cropper = null;
+    let previewUrl = null;
+
+    const supportedImageTypes = new Set([
+        'image/jpeg',
+        'image/png',
+        'image/bmp'
+    ]);
+    const supportedImageExtensions = ['.jpg', '.jpeg', '.png', '.bmp'];
+    const unsupportedImageMessage = 'Unsupported image format. Please upload a JPG, PNG, or BMP receipt image.';
 
     const cameraInput = document.getElementById('cameraInput');
     const fileInput = document.getElementById('receiptInput');
@@ -10,9 +19,20 @@
     const form = document.getElementById('uploadForm');
     const emptyPreview = document.getElementById('emptyPreview');
     const croppedImage = document.getElementById('croppedImage');
+    const errorModalElement = document.getElementById('uploadErrorModal');
+    const errorMessageElement = document.getElementById('uploadErrorMessage');
+    const initialErrorMessage = document.getElementById('uploadInitialErrorMessage');
 
     if (!cameraInput || !fileInput || !takePhotoBtn || !chooseFileBtn || !image || !scanBtn || !form || !croppedImage) {
         return;
+    }
+
+    const errorModal = errorModalElement && window.bootstrap
+        ? new bootstrap.Modal(errorModalElement)
+        : null;
+
+    if (initialErrorMessage && initialErrorMessage.value) {
+        showUploadError(initialErrorMessage.value);
     }
 
     takePhotoBtn.addEventListener('click', function () {
@@ -33,8 +53,17 @@
             return;
         }
 
+        if (!isSupportedImage(file)) {
+            e.target.value = '';
+            resetPreview();
+            showUploadError(unsupportedImageMessage);
+            return;
+        }
+
         croppedImage.value = '';
-        image.src = URL.createObjectURL(file);
+        revokePreviewUrl();
+        previewUrl = URL.createObjectURL(file);
+        image.src = previewUrl;
 
         if (emptyPreview) {
             emptyPreview.classList.add('d-none');
@@ -54,6 +83,12 @@
                 responsive: true
             });
         };
+
+        image.onerror = function () {
+            e.target.value = '';
+            resetPreview();
+            showUploadError('The selected file could not be loaded as an image. Please choose a different receipt image.');
+        };
     }
 
     scanBtn.addEventListener('click', function () {
@@ -64,4 +99,51 @@
 
         form.submit();
     });
+
+    function isSupportedImage(file) {
+        const fileName = file.name.toLowerCase();
+        const hasSupportedType = file.type && supportedImageTypes.has(file.type.toLowerCase());
+        const hasSupportedExtension = supportedImageExtensions.some(function (extension) {
+            return fileName.endsWith(extension);
+        });
+
+        return hasSupportedType || hasSupportedExtension;
+    }
+
+    function resetPreview() {
+        croppedImage.value = '';
+
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+
+        image.removeAttribute('src');
+
+        if (emptyPreview) {
+            emptyPreview.classList.remove('d-none');
+        }
+
+        revokePreviewUrl();
+    }
+
+    function revokePreviewUrl() {
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            previewUrl = null;
+        }
+    }
+
+    function showUploadError(message) {
+        if (errorMessageElement) {
+            errorMessageElement.textContent = message;
+        }
+
+        if (errorModal) {
+            errorModal.show();
+            return;
+        }
+
+        alert(message);
+    }
 });

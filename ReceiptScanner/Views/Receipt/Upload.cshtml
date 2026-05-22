@@ -20,6 +20,7 @@
                 <form id="uploadForm" asp-controller="Receipt" asp-action="Upload" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="croppedImage" id="croppedImage" />
+                    <input type="hidden" id="uploadInitialErrorMessage" value="@ViewBag.UploadErrorMessage" />
 
                     <div class="row g-4">
                         <div class="col-12 col-lg-7">
@@ -102,6 +103,23 @@
         </div>
     </div>
 </section>
+
+<div class="modal fade" id="uploadErrorModal" tabindex="-1" aria-labelledby="uploadErrorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="uploadErrorModalLabel">Image upload error</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="uploadErrorMessage">
+                Unsupported image format. Please upload a JPG, PNG, or BMP receipt image.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Choose another image</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

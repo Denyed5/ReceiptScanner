@@ -33,11 +33,11 @@
 }
 
     .receipt-items-table .item-name-col {
-        width: 36%;
+        width: 34%;
     }
 
     .receipt-items-table .item-quantity-col {
-        width: 8%;
+        width: 10%;
     }
 
     .receipt-items-table .item-price-col {

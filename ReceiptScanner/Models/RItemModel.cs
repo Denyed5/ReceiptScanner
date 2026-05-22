@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ReceiptScanner.Models
 {
@@ -19,5 +20,8 @@ namespace ReceiptScanner.Models
         public string Category { get; set; } = "Други";
         public string? ReceiptId { get; set; } = string.Empty;
         public ReceiptModel? Receipt { get; set; }
+        [NotMapped]
+        public bool HasInvalidTotal =>
+        Math.Round(Quantity * UnitPrice, 2) != Math.Round(TotalPrice, 2);
     }
 }

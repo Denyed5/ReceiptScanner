@@ -44,8 +44,14 @@
 
                         <div class="mb-3">
                             <label asp-for="Date" class="form-label">Date</label>
-                            <input asp-for="Date" class="form-control @(Model.IsDateSuggested ? "suggested-field" : "")" />
+
+                            <input asp-for="Date"
+                                   type="datetime-local"
+                                   asp-format="{0:yyyy-MM-ddTHH:mm}"
+                                   class="form-control @(Model.IsDateSuggested ? "suggested-field" : "")" />
+
                             <span asp-validation-for="Date" class="text-danger small"></span>
+
                             @if (Model.IsDateSuggested)
                             {
                                 <div class="form-text text-warning-emphasis">
@@ -110,7 +116,7 @@
                                         <th>Unit price</th>
                                         <th>Total</th>
                                         <th>Category</th>
-                                        <th class="text-end">Action</th>
+                                        <th class="text-end"></th>
                                     </tr>
                                 </thead>
 
@@ -130,7 +136,18 @@
                                                 <input asp-for="Items[i].UnitPrice" class="form-control item-unit-price" />
                                             </td>
                                             <td data-label="Total">
-                                                <input asp-for="Items[i].TotalPrice" class="form-control item-total-price" />
+                                                <input asp-for="Items[i].TotalPrice"
+                                                       class="form-control item-total-price @(Model.Items[i].HasInvalidTotal ? "suggested-field" : "")" />
+
+                                                @if (Model.Items[i].HasInvalidTotal)
+                                                {
+                                                    var suggestedTotal = (Model.Items[i].Quantity * Model.Items[i].UnitPrice).ToString("F2");
+
+                                                    <div class="form-text text-warning-emphasis mt-1">
+                                                        Suggested:
+                                                        <strong>@suggestedTotal</strong>
+                                                    </div>
+                                                }
                                             </td>
                                             <td data-label="Category">
                                                 <input asp-for="Items[i].Category" class="form-control item-category" />
@@ -202,7 +219,10 @@
             <input data-field="Category" class="form-control item-category" value="Други" />
         </td>
         <td data-label="Action" class="text-end">
-            <button type="button" class="btn btn-outline-danger btn-sm remove-item-btn" aria-label="Remove item" title="Remove item">
+            <button type="button"
+                    class="btn btn-outline-danger btn-sm remove-item-btn"
+                    aria-label="Remove item"
+                    title="Remove item">
                 &times;
             </button>
         </td>
