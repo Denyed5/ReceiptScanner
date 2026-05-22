@@ -150,7 +150,11 @@
                                                 }
                                             </td>
                                             <td data-label="Category">
-                                                <input asp-for="Items[i].Category" class="form-control item-category" />
+                                                <select asp-for="Items[i].CategoryId"
+                                                        class="form-select item-category"
+                                                        asp-items="@(new SelectList(ViewBag.Categories, "CategoryId", "Name"))">
+                                                    <option value="">Select category</option>
+                                                </select>
                                             </td>
                                             <td data-label="Action" class="text-end">
                                                 <button type="button" class="btn btn-outline-danger btn-sm remove-item-btn" aria-label="Remove item" title="Remove item">
@@ -216,7 +220,14 @@
             <input data-field="TotalPrice" class="form-control item-total-price" value="0.00" />
         </td>
         <td data-label="Category">
-            <input data-field="Category" class="form-control item-category" value="Други" />
+            <select data-field="CategoryId" class="form-select item-category">
+                <option value="">Select category</option>
+
+                @foreach (var category in ViewBag.Categories)
+                {
+                    <option value="@category.CategoryId">@category.Name</option>
+                }
+            </select>
         </td>
         <td data-label="Action" class="text-end">
             <button type="button"

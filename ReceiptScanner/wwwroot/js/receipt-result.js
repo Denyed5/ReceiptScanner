@@ -38,14 +38,14 @@
     function refreshItemIndexes() {
         const rows = itemsBody.querySelectorAll('tr.receipt-item-row');
 
-        rows.forEach(function (row, index) {
-            setInputName(row, index, 'ItemId');
-            setInputName(row, index, 'ReceiptId');
-            setInputName(row, index, 'Name');
-            setInputName(row, index, 'Quantity');
-            setInputName(row, index, 'UnitPrice');
-            setInputName(row, index, 'TotalPrice');
-            setInputName(row, index, 'Category');
+            rows.forEach(function (row, index) {
+                setInputName(row, index, 'ItemId');
+                setInputName(row, index, 'ReceiptId');
+                setInputName(row, index, 'Name');
+                setInputName(row, index, 'Quantity');
+                setInputName(row, index, 'UnitPrice');
+                setInputName(row, index, 'TotalPrice');
+                setInputName(row, index, 'CategoryId');
         });
 
         if (emptyItemsMessage) {

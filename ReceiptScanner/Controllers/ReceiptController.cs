@@ -97,6 +97,7 @@ namespace ReceiptScanner.Controllers
 
             var receipt = await _context.Receipts
                 .Include(r => r.Items)
+                .ThenInclude(i => i.Category)
                 .FirstOrDefaultAsync(r => r.ReceiptId == id && r.UserId == userId);
 
             if (receipt == null)
@@ -125,12 +126,15 @@ namespace ReceiptScanner.Controllers
 
             var receipt = await _context.Receipts
                 .Include(r => r.Items)
+                .ThenInclude(i => i.Category)
                 .FirstOrDefaultAsync(r => r.ReceiptId == id && r.UserId == userId);
 
             if (receipt == null)
             {
                 return NotFound();
             }
+
+            ViewBag.Categories = await _context.Categories.ToListAsync();
 
             return View(receipt);
         }
@@ -166,11 +170,14 @@ namespace ReceiptScanner.Controllers
 
             if (!ModelState.IsValid)
             {
+                ViewBag.Categories = await _context.Categories.ToListAsync();
+
                 return View(model);
             }
 
             var receipt = await _context.Receipts
                 .Include(r => r.Items)
+                .ThenInclude(i => i.Category)
                 .FirstOrDefaultAsync(r => r.ReceiptId == model.ReceiptId && r.UserId == userId);
 
             if (receipt == null)
@@ -185,9 +192,10 @@ namespace ReceiptScanner.Controllers
             receipt.RawText = model.RawText;
 
             _context.ReceiptItems.RemoveRange(receipt.Items);
-            receipt.Items = model.Items ?? new List<RItemModel>();
 
-            foreach (var item in receipt.Items)
+            receipt.Items.Clear();
+
+            foreach (var item in model.Items ?? new List<RItemModel>())
             {
                 if (string.IsNullOrWhiteSpace(item.ItemId))
                 {
@@ -195,6 +203,10 @@ namespace ReceiptScanner.Controllers
                 }
 
                 item.ReceiptId = receipt.ReceiptId;
+
+                item.Category = null;
+
+                receipt.Items.Add(item);
             }
 
             await _context.SaveChangesAsync();
@@ -320,6 +332,8 @@ namespace ReceiptScanner.Controllers
 
             ApplySuggestedValues(result);
 
+            ViewBag.Categories = await _context.Categories.ToListAsync();
+
             return View("Result", result);
         }
 
@@ -333,6 +347,7 @@ namespace ReceiptScanner.Controllers
             }
 
             ApplyCurrencyConversion(model);
+
             model.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
             ModelState.Remove(nameof(ReceiptModel.TotalBGN));
@@ -350,10 +365,18 @@ namespace ReceiptScanner.Controllers
 
             if (!ModelState.IsValid)
             {
+                ViewBag.Categories = await _context.Categories.ToListAsync();
+
                 return View("Result", model);
             }
 
+            foreach (var item in model.Items)
+            {
+                item.Category = null;
+            }
+
             _context.Receipts.Add(model);
+
             await _context.SaveChangesAsync();
 
             return View("Saved");

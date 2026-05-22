@@ -16,8 +16,8 @@ namespace ReceiptScanner.Models
         [Range(0.01, 999999.99, ErrorMessage = "Total price must be greater than 0.")]
         public decimal TotalPrice { get; set; }
         public bool IsWeighted { get; set; }
-        [Required(ErrorMessage = "Category is required.")]
-        public string Category { get; set; } = "Други";
+        public string? CategoryId { get; set; }
+        public CategoryModel? Category { get; set; }
         public string? ReceiptId { get; set; } = string.Empty;
         public ReceiptModel? Receipt { get; set; }
         [NotMapped]

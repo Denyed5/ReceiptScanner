@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
 using ReceiptScanner.Areas.Identity.Data;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ReceiptScanner.Models
 {
+    [Index(nameof(UserId))]
     public class ReceiptModel
     {
         [Key]
@@ -25,6 +27,7 @@ namespace ReceiptScanner.Models
         public string RawText { get; set; } = "";
         public List<RItemModel> Items { get; set; } = new();
         public List<string> RawTextLines { get; set; } = new();
+        public string? ImagePath { get; set; }
         public string UserId { get; set; } = string.Empty;
         public ReceiptScannerUser? User { get; set; }
 

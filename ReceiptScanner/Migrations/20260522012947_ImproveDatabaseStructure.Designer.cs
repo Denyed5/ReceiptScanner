@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ReceiptScanner.Data;
 
@@ -11,9 +12,11 @@ using ReceiptScanner.Data;
 namespace ReceiptScanner.Migrations
 {
     [DbContext(typeof(ReceiptScannerContext))]
-    partial class ReceiptScannerContextModelSnapshot : ModelSnapshot
+    [Migration("20260522012947_ImproveDatabaseStructure")]
+    partial class ImproveDatabaseStructure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -236,88 +239,6 @@ namespace ReceiptScanner.Migrations
                     b.HasKey("CategoryId");
 
                     b.ToTable("Categories");
-
-                    b.HasData(
-                        new
-                        {
-                            CategoryId = "1",
-                            Name = "Месо"
-                        },
-                        new
-                        {
-                            CategoryId = "2",
-                            Name = "Напитки"
-                        },
-                        new
-                        {
-                            CategoryId = "3",
-                            Name = "Плодове"
-                        },
-                        new
-                        {
-                            CategoryId = "4",
-                            Name = "Зеленчуци"
-                        },
-                        new
-                        {
-                            CategoryId = "5",
-                            Name = "Млечни"
-                        },
-                        new
-                        {
-                            CategoryId = "6",
-                            Name = "Хляб и тестени"
-                        },
-                        new
-                        {
-                            CategoryId = "7",
-                            Name = "Замразени храни"
-                        },
-                        new
-                        {
-                            CategoryId = "8",
-                            Name = "Сладки и десерти"
-                        },
-                        new
-                        {
-                            CategoryId = "9",
-                            Name = "Снаксове"
-                        },
-                        new
-                        {
-                            CategoryId = "10",
-                            Name = "Консерви"
-                        },
-                        new
-                        {
-                            CategoryId = "11",
-                            Name = "Подправки и сосове"
-                        },
-                        new
-                        {
-                            CategoryId = "12",
-                            Name = "Готови храни"
-                        },
-                        new
-                        {
-                            CategoryId = "13",
-                            Name = "Домашни потреби"
-                        },
-                        new
-                        {
-                            CategoryId = "14",
-                            Name = "Козметика и хигиена"
-                        },
-                        new
-                        {
-                            CategoryId = "15",
-                            Name = "Алкохол"
-                        },
-                        new
-                        {
-                            CategoryId = "16",
-                            Name = "Други"
-                        });
                 });
 
             modelBuilder.Entity("ReceiptScanner.Models.RItemModel", b =>

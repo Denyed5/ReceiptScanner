@@ -26,6 +26,7 @@
                 <div class="border rounded-3 p-3 h-100">
                     <div class="text-muted small">Total spent</div>
                     <div class="h3 mb-0">@Model.TotalSpentBGN.ToString("0.00") лв.</div>
+                    <div class="h3 mb-0">@Model.TotalSpentEUR.ToString("0.00") евро</div>
                 </div>
             </div>
 
@@ -33,6 +34,7 @@
                 <div class="border rounded-3 p-3 h-100">
                     <div class="text-muted small">This month</div>
                     <div class="h3 mb-0">@Model.ThisMonthSpentBGN.ToString("0.00") лв.</div>
+                    <div class="h3 mb-0">@Model.ThisMonthSpentEUR.ToString("0.00") евро</div>
                 </div>
             </div>
 
@@ -59,7 +61,7 @@
                     Scan your first receipt to start building your expense history.
                 </p>
                 <a asp-controller="Receipt" asp-action="Upload" class="btn btn-primary btn-lg">
-                    Scan first receipt
+                    Scan your first receipt
                 </a>
             </div>
         }
@@ -85,7 +87,7 @@
                                         <tr>
                                             <td>@(receipt.VendorName ?? "Unknown")</td>
                                             <td>@(receipt.Date?.ToString("dd.MM.yyyy") ?? "-")</td>
-                                            <td class="text-end">@((receipt.TotalBGN ?? 0).ToString("0.00")) лв.</td>
+                                            <td class="text-end">@((receipt.TotalEUR ?? 0).ToString("0.00")) евро</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -114,7 +116,7 @@
                                     <div>
                                         <div class="d-flex justify-content-between gap-3 mb-1">
                                             <span>@category.Key</span>
-                                            <span class="text-muted">@category.Value.ToString("0.00") лв.</span>
+                                            <span class="text-muted">@category.Value.ToString("0.00") евро</span>
                                         </div>
                                         <div class="progress" style="height: 8px;">
                                             <div class="progress-bar" style="width: @percent%;"></div>

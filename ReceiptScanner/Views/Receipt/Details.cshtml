@@ -83,7 +83,7 @@
                                             <td class="text-end">@item.Quantity.ToString("0.##")</td>
                                             <td class="text-end">@item.UnitPrice.ToString("0.00")</td>
                                             <td class="text-end">@item.TotalPrice.ToString("0.00")</td>
-                                            <td>@item.Category</td>
+                                            <td>@(item.Category?.Name ?? "No category")</td>
                                         </tr>
                                     }
                                 </tbody>

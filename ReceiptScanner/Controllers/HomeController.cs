@@ -39,6 +39,7 @@ namespace ReceiptScanner.Controllers
 
             var receipts = await _context.Receipts
                 .Include(r => r.Items)
+                .ThenInclude(i => i.Category)
                 .Where(r => r.UserId == userId)
                 .OrderByDescending(r => r.Date)
                 .ToListAsync();
@@ -47,8 +48,8 @@ namespace ReceiptScanner.Controllers
 
             var categoryTotals = receipts
                 .SelectMany(r => r.Items)
-                .Where(i => !string.IsNullOrWhiteSpace(i.Category))
-                .GroupBy(i => i.Category)
+                .Where(i => i.Category != null)
+                .GroupBy(i => i.Category!.Name)
                 .OrderByDescending(g => g.Sum(i => i.TotalPrice))
                 .ToDictionary(g => g.Key, g => g.Sum(i => i.TotalPrice));
 
@@ -64,6 +65,10 @@ namespace ReceiptScanner.Controllers
                 ThisMonthSpentBGN = receipts
                     .Where(r => r.Date.HasValue && r.Date.Value >= monthStart)
                     .Sum(r => r.TotalBGN ?? 0),
+                TotalSpentEUR = receipts.Sum(r => r.TotalEUR ?? 0),
+                ThisMonthSpentEUR = receipts
+                    .Where(r => r.Date.HasValue && r.Date.Value >= monthStart)
+                    .Sum(r => r.TotalEUR ?? 0),
                 TopCategory = categoryTotals.FirstOrDefault().Key ?? "No data",
                 RecentReceipts = receipts.Take(5).ToList(),
                 CategoryTotals = categoryTotals,
