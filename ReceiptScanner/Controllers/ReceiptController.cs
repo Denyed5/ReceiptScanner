@@ -34,15 +34,18 @@ namespace ReceiptScanner.Controllers
         private readonly ImagePreprocessingService _preprocessing;
         private readonly ReceiptScannerContext _context;
         private readonly CategoryDetectionService _categoryDetectionService;
+        private readonly IWebHostEnvironment _env;
         public ReceiptController(OcrService ocr, ReceiptParserService parser,
                                  ImagePreprocessingService preprocessing, ReceiptScannerContext context, 
-                                 CategoryDetectionService categoryDetectionService)
+                                 CategoryDetectionService categoryDetectionService,
+                                 IWebHostEnvironment env)
         {
             _ocr = ocr;
             _parser = parser;
             _preprocessing = preprocessing;
             _context = context;
             _categoryDetectionService = categoryDetectionService;
+            _env = env;
         }
 
         [HttpGet]
@@ -139,6 +142,47 @@ namespace ReceiptScanner.Controllers
             ViewBag.Categories = await _context.Categories.ToListAsync();
 
             return View(receipt);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Image(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return NotFound();
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Redirect("/Identity/Account/Login");
+            }
+
+            var receipt = await _context.Receipts
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.ReceiptId == id && r.UserId == userId);
+
+            if (receipt == null || string.IsNullOrWhiteSpace(receipt.ImagePath))
+            {
+                return NotFound();
+            }
+
+            var fullPath = GetStoredImageFullPath(receipt.ImagePath);
+            var allowedRoot = Path.GetFullPath(Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages"));
+
+            if (!fullPath.StartsWith(allowedRoot, StringComparison.OrdinalIgnoreCase))
+            {
+                return NotFound();
+            }
+
+            if (!System.IO.File.Exists(fullPath))
+            {
+                return NotFound();
+            }
+
+            return PhysicalFile(fullPath, "image/png");
         }
 
         [Authorize]
@@ -246,6 +290,18 @@ namespace ReceiptScanner.Controllers
             _context.Receipts.Remove(receipt);
             await _context.SaveChangesAsync();
 
+            if (!string.IsNullOrWhiteSpace(receipt.ImagePath))
+            {
+                var imageFullPath = GetStoredImageFullPath(receipt.ImagePath);
+                var allowedRoot = Path.GetFullPath(Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages"));
+
+                if (imageFullPath.StartsWith(allowedRoot, StringComparison.OrdinalIgnoreCase)
+                    && System.IO.File.Exists(imageFullPath))
+                {
+                    System.IO.File.Delete(imageFullPath);
+                }
+            }
+
             return RedirectToAction(nameof(History));
         }
 
@@ -312,17 +368,30 @@ namespace ReceiptScanner.Controllers
                 finalBytes = image.ToBytes(".png");
             }
 
+            var tempImageDirectory = Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages", "Temp");
+            Directory.CreateDirectory(tempImageDirectory);
+
+            var tempImageFileName = $"{Guid.NewGuid():N}.png";
+            var tempImageFullPath = Path.Combine(tempImageDirectory, tempImageFileName);
+
+            await System.IO.File.WriteAllBytesAsync(tempImageFullPath, finalBytes);
+
+            var tempImagePath = Path.Combine("App_Data", "ReceiptImages", "Temp", tempImageFileName);
+
             var result = await _ocr.ReadText(finalBytes, model.Language);
 
-            string? vendorLine = _parser.ExtractVendorLine(result.RawText, 5);
+            result.ImagePath = tempImagePath;
+
+            var lines = _parser.GetCleanLines(result.RawText);
+            string? vendorLine = _parser.ExtractVendorLine(lines, 5);
             if (vendorLine == "Не може да бъде извлечен.")
             {
                 vendorLine = null;
             }
-            DateTime? date = _parser.ExtractDateTime(result.RawText);
-            decimal? totalBGN = _parser.ExtractTotalSumBGN(result.RawText);
-            decimal? totalEUR = _parser.ExtractTotalSumEUR(result.RawText);
-            List<RItemModel> items = _parser.ExtractPurchases(result.RawText);
+            DateTime? date = _parser.ExtractDateTime(lines);
+            decimal? totalBGN = _parser.ExtractTotalSumBGN(lines);
+            decimal? totalEUR = _parser.ExtractTotalSumEUR(lines);
+            List<RItemModel> items = _parser.ExtractPurchases(lines);
 
             foreach (var item in items)
             {
@@ -386,6 +455,8 @@ namespace ReceiptScanner.Controllers
                 return View("Result", model);
             }
 
+            model.ImagePath = MoveTempReceiptImageToUserStorage(model.ImagePath, model.UserId, model.ReceiptId);
+
             foreach (var item in model.Items)
             {
                 item.Category = null;
@@ -448,6 +519,58 @@ namespace ReceiptScanner.Controllers
         {
             ViewBag.UploadErrorMessage = message;
             return View("Upload", model);
+        }
+
+        private string GetReceiptImagesDirectory(string userId)
+        {
+            return Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages", GetSafePathSegment(userId));
+        }
+
+        private string GetReceiptImageRelativePath(string userId, string fileName)
+        {
+            return Path.Combine("App_Data", "ReceiptImages", GetSafePathSegment(userId), fileName);
+        }
+
+        private string GetStoredImageFullPath(string imagePath)
+        {
+            return Path.GetFullPath(Path.Combine(_env.ContentRootPath, imagePath));
+        }
+
+        private string? MoveTempReceiptImageToUserStorage(string? tempImagePath, string userId, string receiptId)
+        {
+            if (string.IsNullOrWhiteSpace(tempImagePath))
+            {
+                return null;
+            }
+
+            var tempFullPath = GetStoredImageFullPath(tempImagePath);
+            var tempRoot = Path.GetFullPath(Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages", "Temp"));
+
+            if (!tempFullPath.StartsWith(tempRoot, StringComparison.OrdinalIgnoreCase)
+                || !System.IO.File.Exists(tempFullPath))
+            {
+                return null;
+            }
+
+            var userImageDirectory = GetReceiptImagesDirectory(userId);
+            Directory.CreateDirectory(userImageDirectory);
+
+            var finalFileName = $"{receiptId}.png";
+            var finalFullPath = Path.Combine(userImageDirectory, finalFileName);
+
+            System.IO.File.Move(tempFullPath, finalFullPath, overwrite: true);
+
+            return GetReceiptImageRelativePath(userId, finalFileName);
+        }
+
+        private static string GetSafePathSegment(string value)
+        {
+            foreach (var invalidChar in Path.GetInvalidFileNameChars())
+            {
+                value = value.Replace(invalidChar, '_');
+            }
+
+            return value;
         }
     }
 }

@@ -9,6 +9,7 @@
             @using (Html.BeginForm("ConfirmReceipt", "Receipt", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
+                <input asp-for="ImagePath" type="hidden" />
                 <input asp-for="RawText" type="hidden" />
                 <input asp-for="IsDateSuggested" type="hidden" />
                 <input asp-for="IsTotalBGNSuggested" type="hidden" />
@@ -60,6 +61,19 @@
                                 }
                             </div>
 
+                        <div class="mb-0">
+                            <label asp-for="TotalEUR" class="form-label">Общо в евро</label>
+                            <input asp-for="TotalEUR" class="form-control @(Model.IsTotalEURSuggested ? "suggested-field" : "")" />
+                            <span asp-validation-for="TotalEUR" class="text-danger small"></span>
+
+                            @if (Model.IsTotalEURSuggested)
+                            {
+                                <div class="form-text text-warning-emphasis">
+                                    Сумата в евро беше изчислена от лева чрез фиксирания обменен курс.
+                                </div>
+                            }
+                        </div>
+
                             <div class="mb-3">
                                 <label asp-for="TotalBGN" class="form-label">Общо в лева</label>
                                 <input asp-for="TotalBGN" class="form-control @(Model.IsTotalBGNSuggested ? "suggested-field" : "")" />
@@ -69,19 +83,6 @@
                                 {
                                     <div class="form-text text-warning-emphasis">
                                         Сумата в лева беше изчислена от евро чрез фиксирания обменен курс.
-                                    </div>
-                                }
-                            </div>
-
-                            <div class="mb-0">
-                                <label asp-for="TotalEUR" class="form-label">Общо в евро</label>
-                                <input asp-for="TotalEUR" class="form-control @(Model.IsTotalEURSuggested ? "suggested-field" : "")" />
-                                <span asp-validation-for="TotalEUR" class="text-danger small"></span>
-
-                                @if (Model.IsTotalEURSuggested)
-                                {
-                                    <div class="form-text text-warning-emphasis">
-                                        Сумата в евро беше изчислена от лева чрез фиксирания обменен курс.
                                     </div>
                                 }
                             </div>
@@ -95,6 +96,7 @@
                                     <h2 class="h5 fw-semibold mb-1">Закупени продукти</h2>
                                     <p class="text-muted small mb-0">
                                         Редактирай таблицата преди запазване на касовата бележка.
+                                        <br> Колоните Ед.цена и Общо са в евро.
                                     </p>
                                 </div>
 
@@ -159,24 +161,20 @@
                                             </td>
 
                                             <td data-label="Общо">
-
-                                                <input asp-for="Items[i].TotalPrice"
-                                                       class="form-control item-total-price @(Model.Items[i].HasInvalidTotal ? "suggested-field" : "")" />
-
                                                 @if (Model.Items[i].HasInvalidTotal)
                                                 {
                                                     var suggestedTotal =
                                                         (Model.Items[i].Quantity *
                                                          Model.Items[i].UnitPrice)
                                                         .ToString("F2");
-
                                                     <div class="form-text text-warning-emphasis mt-1">
-
                                                         Предложено:
                                                         <strong>@suggestedTotal</strong>
-
                                                     </div>
                                                 }
+
+                                                <input asp-for="Items[i].TotalPrice"
+                                                       class="form-control item-total-price @(Model.Items[i].HasInvalidTotal ? "suggested-field" : "")" />
 
                                             </td>
 
@@ -196,7 +194,7 @@
                                                 {
                                                     <div class="form-text text-warning-emphasis mt-1">
 
-                                                        Suggested category
+                                                        Предложено
 
                                                     </div>
                                                 }
@@ -225,7 +223,7 @@
                             </div>
 
                             <div id="emptyItemsMessage" class="alert alert-warning mt-3 mb-0 @(Model.Items.Count > 0 ? "d-none" : "")">
-                                В момента няма добавени продукти. При нужда добави продукт ръчно.
+                                В момента няма добавени продукти. При нужда добави продукти ръчно.
                             </div>
                         </div>
                     </div>
@@ -245,7 +243,7 @@
                             }
                             else
                             {
-                                <p class="text-muted mb-0">Няма налични редове със суров текст.</p>
+                                <p class="text-muted mb-0">OCR не успя да извлече текст.</p>
                             }
                         </div>
                     </div>

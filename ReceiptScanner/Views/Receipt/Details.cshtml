@@ -145,6 +145,76 @@
                     }
                 </div>
             </div>
+            @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
+            {
+                <div class="col-12">
+                    <div class="border rounded-3 p-3 p-md-4">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mb-3">
+                            <h2 class="h5 fw-semibold mb-0">Снимка на касовата бележка</h2>
+                            <span class="text-muted small">Натисни снимката за по-голям преглед.</span>
+                        </div>
+
+                        <button type="button"
+                                class="receipt-image-frame"
+                                data-bs-toggle="modal"
+                                data-bs-target="#receiptImageModal"
+                                aria-label="Отвори снимката на касовата бележка">
+                            <img src="@Url.Action("Image", "Receipt", new { id = Model.ReceiptId })"
+                                 class="receipt-image-preview"
+                                 alt="Снимка на касова бележка" />
+                        </button>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </section>
+
+@if (!string.IsNullOrWhiteSpace(Model.ImagePath))
+{
+    <div class="modal fade" id="receiptImageModal" tabindex="-1" aria-labelledby="receiptImageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-md-down modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="receiptImageModalLabel">Снимка на касовата бележка</h2>
+                    <div class="receipt-image-tools ms-auto me-2" aria-label="Управление на увеличението">
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-sm receipt-zoom-btn"
+                                data-receipt-zoom="out"
+                                aria-label="Отдалечи"
+                                title="Отдалечи">
+                            -
+                        </button>
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-sm receipt-zoom-btn"
+                                data-receipt-zoom="reset"
+                                aria-label="Нулирай увеличението"
+                                title="Нулирай увеличението">
+                            1:1
+                        </button>
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-sm receipt-zoom-btn"
+                                data-receipt-zoom="in"
+                                aria-label="Приближи"
+                                title="Приближи">
+                            +
+                        </button>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Затвори"></button>
+                </div>
+                <div class="modal-body receipt-image-modal-body">
+                    <div class="receipt-image-zoom-canvas" id="receiptImageZoomCanvas">
+                        <img src="@Url.Action("Image", "Receipt", new { id = Model.ReceiptId })"
+                             class="receipt-image-full"
+                             id="receiptImageFull"
+                             alt="Снимка на касова бележка" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/receipt-details.js" asp-append-version="true"></script>
+}

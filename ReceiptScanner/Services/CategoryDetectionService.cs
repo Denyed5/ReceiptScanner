@@ -8,7 +8,6 @@ namespace ReceiptScanner.Services
     {
         public string CategoryId { get; set; } = "16";
 
-        // true = fuzzy match / suggested
         public bool IsSuggested { get; set; }
     }
 
@@ -240,9 +239,6 @@ namespace ReceiptScanner.Services
             var normalized =
                 productName.ToLowerInvariant();
 
-
-            // 1. EXACT MATCH
-
             foreach (var category in _categoryKeywords)
             {
                 if (category.Value.Any(keyword =>
@@ -255,9 +251,6 @@ namespace ReceiptScanner.Services
                     };
                 }
             }
-
-
-            // 2. FUZZY MATCH
 
             foreach (var category in _categoryKeywords)
             {
@@ -287,9 +280,6 @@ namespace ReceiptScanner.Services
                 }
             }
 
-
-            // 3. FALLBACK
-
             return new CategoryDetectionResult
             {
                 CategoryId = "16",
@@ -299,7 +289,7 @@ namespace ReceiptScanner.Services
 
         private static int LevenshteinDistance(
             string source,
-            string target)
+            string target)  
         {
             int[,] matrix =
                 new int[source.Length + 1,

@@ -20,43 +20,116 @@ namespace ReceiptScanner.Services
             "ОПЕРАТОР", "КАСИЕР"
         };
 
-        private static readonly string[] LegalKeywordsTotal =
+        private static readonly string[] TotalsSectionKeywords =
         {
-            "ОБЩО", "ОБЩА СУМА",
-            "TOTAL", "ТОТАЛ"
+            "ОБЩО",
+            "ОБЩА СУМА",
+            "TOTAL",
+            "ТОТАЛ",
+            "СУМА ЕВРО",
+            "ОБЩА СУМА ЕВРО"
         };
 
-        private static readonly string[] LegalKeywordsTotalBGN =
+        private static readonly string[] TotalEurKeywords =
         {
-            "ЛВ", "BGN", "ЛЕВА", "LV", "LEVA", "ЛB"
+            "ОБЩА СУМА",
+            "ОБЩО",
+            "ЗА ПЛАЩАНЕ",
+            "ДЪЛЖИМА СУМА",
+            "ВСИЧКО",
+            "TOTAL",
+            "ТОТАЛ",
+            "ОБЩА СУМА ЕВРО"
         };
 
-        private static readonly string[] LegalKeywordsTotalEUR =
+        private static readonly string[] TotalBgnKeywords =
         {
-            "ЕВРО", "EUR", "EURO"
+            "ЛВ",
+            "ЛВ.",
+            "ЛЕВА",
+            "ЛЕВ",
+            "BGN",
+            "(ЛВ)",
+            "ОБЩА СУМА ЛЕВА",
+            "ОБЩА СУМА ЛВ"
+        };
+
+        private static readonly string[] TotalIgnoreKeywords =
+        {
+            "МЕЖДИННА",
+            "ОТСТЪПКА",
+            "ОТСТЪПКИ",
+            "КУПОН",
+            "ВАУЧЕР",
+            "РЕСТО",
+            "ДДС",
+            "КАРТА",
+            "КРЕДИТНА",
+            "ДЕБИТНА"
+        };
+
+        private static readonly string[] TotalBgnIgnoreKeywords =
+        {
+            "МЕЖДИННА",
+            "ЕВРО",
+            "EUR",
+            "EURO",
+            "ОТСТЪПКА",
+            "ОТСТЪПКИ",
+            "КУПОН",
+            "ВАУЧЕР",
+            "РЕСТО",
+            "ДДС"
+        };
+
+        private static readonly string[] InvalidProductKeywords =
+        {
+            "ОБЩО",
+            "ОБЩА СУМА",
+            "МЕЖДИННА СУМА",
+            "ОТСТЪПКА",
+            "ОТСТЪПКИ",
+            "ЕВРО",
+            "СУМА",
+            "ДДС",
+            "КАСОВ",
+            "ФИСКАЛЕН",
+            "БОН",
+            "ПЛАЩАНЕ",
+            "РЕСТО",
+            "КАРТА",
+            "В БРОЙ",
+            "ОПЕРАТОР",
+            "КАСИЕР"
+        };
+
+        private static readonly string[] ProductNoiseKeywords =
+        {
+            "ОТСТЪПКА",
+            "ОТСТЪПКИ",
+            "LIDL PLUS",
+            "КУПОН",
+            "КУПОНИ",
+            "ВАУЧЕР"
         };
 
         private static readonly Regex QuantityRegex =
-            new Regex(@"\d+[.,]\d+\s*x\s*\d+[.,]\d+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            new Regex(@"\d+(?:[.,]\d+)?\s*x\s*\d+[.,]\d{1,2}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private static readonly Regex PriceRegex =
-            new Regex(@"\d+[.,]\d{2}", RegexOptions.Compiled);
+            new Regex(@"(?<!\d)\d+[.,]\d{1,2}(?!\d)", RegexOptions.Compiled);
 
-        public string? ExtractVendorLine(string rawText, int headerLinesCount)
+        public string? ExtractVendorLine(List<string> lines, int headerLinesCount)
         {
-            var lines = GetCleanLines(rawText)
-                .Take(headerLinesCount)
-                .ToList();
-
             var cleaned = lines
-                .Where(l => !ContainsAny(l, IgnoreKeywordsVendor))
+                .Where(l => !ContainsAny(l, IgnoreKeywordsVendor)) // Филтриране на редовете, които съдържат думи за игнориране
                 .ToList();
 
             if (cleaned.Count == 0)
                 return null;
 
             var legal = cleaned
-                .FirstOrDefault(l => ContainsAny(l, LegalKeywordsVendor));
+                .FirstOrDefault(l => ContainsAny(l, LegalKeywordsVendor)); // Извлича първия ред, който съдържа данни за търговеца
 
             if (!string.IsNullOrWhiteSpace(legal))
                 return legal;
@@ -64,13 +137,75 @@ namespace ReceiptScanner.Services
             return null;
         }
 
+        private string NormalizeOCRText(string text)
+        {
+            return text
+
+                // New lines
+                .Replace("\r\n", "\n")
+                .Replace('\r', '\n')
+
+                // Multiplication symbols
+                .Replace("×", "x")
+                .Replace("х", "x")
+                .Replace("Х", "x")
+                .Replace("*", "x")
+
+                // Bulgarian currency mistakes
+                .Replace("ЛB", "ЛВ")
+                .Replace("лB", "лв")
+                .Replace("LB", "ЛВ")
+                .Replace("IB", "ЛВ")
+
+                // Commom punctuation mistakes
+                .Replace("‚", ",")
+                .Replace("‘", "'")
+                .Replace("’", "'")
+                .Replace("`", "'")
+                .Replace("“", "\"")
+                .Replace("”", "\"")
+
+                // Spacing artifacts
+                .Replace("  ", " ")
+                .Replace("   ", " ")
+
+                .Replace("|", "1")
+
+                // Common Latin/Cyrillic mixups
+                .Replace("K", "К")
+                .Replace("M", "М")
+                .Replace("H", "Н")
+                .Replace("P", "Р")
+                .Replace("C", "С")
+                .Replace("X", "Х")
+                .Replace("!", "l") //           !!!
+
+                // Normalize tabs
+                .Replace("\t", " ")
+
+                .Replace("..", ".")
+                .Replace(",.", ".")
+                .Replace(".,", ".")
+                .Replace("»", "")
+                .Replace(">", "")
+                .Replace("«", "")
+
+                // Normalize decimal separator spacing
+                .Replace(" ,", ",")
+                .Replace(", ", ",")
+                .Replace(" .", ".")
+                .Replace(". ", ".")
+
+                .Replace("BG ", "BG")
+                .Replace("B G", "BG");
+        }
+
         public List<string> GetCleanLines(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
                 return new List<string>();
 
-            text = text.Replace("\r\n", "\n")
-                       .Replace('\r', '\n');
+            text = NormalizeOCRText(text);
 
             return text
                 .Split('\n')
@@ -90,10 +225,9 @@ namespace ReceiptScanner.Services
             return false;
         }
 
-        public DateTime? ExtractDateTime(string rawText)
+        public DateTime? ExtractDateTime(List<string> lines)
         {
             var regex = new Regex(@"\d{1,2}[./-]\d{1,2}[./-]\d{2,4}(\s+\d{1,2}:\d{2}(:\d{2})?)?");
-            var lines = GetCleanLines(rawText);
             var culture = new System.Globalization.CultureInfo("bg-BG");
 
             foreach (var line in lines)
@@ -112,68 +246,59 @@ namespace ReceiptScanner.Services
             return null;
         }
 
-        public decimal? ExtractTotalSumBGN(string rawText)
+        public decimal? ExtractTotalSumEUR(List<string> lines)
         {
-            var lines = GetCleanLines(rawText);
-            var exactCurrencyTotal = ExtractTotalByCurrency(lines, LegalKeywordsTotalBGN);
-
-            if (exactCurrencyTotal.HasValue)
-                return exactCurrencyTotal;
-
-            return ExtractTotalWithoutCurrency(lines);
+            return ExtractTotal(lines, TotalEurKeywords, TotalIgnoreKeywords);
         }
 
-        public decimal? ExtractTotalSumEUR(string rawText)
+        public decimal? ExtractTotalSumBGN(List<string> lines)
         {
-            var lines = GetCleanLines(rawText);
-            return ExtractTotalByCurrency(lines, LegalKeywordsTotalEUR);
+            return ExtractTotal(lines, TotalBgnKeywords, TotalIgnoreKeywords);
         }
 
-        private static decimal? ExtractTotalByCurrency(List<string> lines, string[] currencyKeywords)
+        private static decimal? ExtractTotal(
+            List<string> lines,
+            string[] totalKeywords,
+            string[] ignoreKeywords)
         {
-            foreach (var line in lines)
+            foreach (var keyword in totalKeywords)
             {
-                if (!ContainsAny(line, LegalKeywordsTotal) || !ContainsAny(line, currencyKeywords))
-                    continue;
+                foreach (var line in lines)
+                {
+                    if (!line.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+                        continue;
 
-                var prices = PriceRegex.Matches(line)
-                    .Select(m => ParsePrice(m.Value))
-                    .Where(v => v.HasValue)
-                    .Select(v => v!.Value)
-                    .ToList();
+                    if (ContainsAny(line, ignoreKeywords))
+                        continue;
 
-                if (prices.Count > 0)
-                    return prices[^1];
+                    var price = ExtractLastPrice(line);
+
+                    if (price.HasValue)
+                        return price.Value;
+                }
             }
 
             return null;
         }
 
-        private static decimal? ExtractTotalWithoutCurrency(List<string> lines)
+        private static decimal? ExtractLastPrice(string line)
         {
-            foreach (var line in lines)
-            {
-                if (!ContainsAny(line, LegalKeywordsTotal))
-                    continue;
+            var prices = PriceRegex.Matches(line)
+                .Select(m => ParseDecimal(m.Value))
+                .Where(v => v.HasValue)
+                .Select(v => v!.Value)
+                .ToList();
 
-                if (ContainsAny(line, LegalKeywordsTotalEUR))
-                    continue;
+            if (prices.Count == 0)
+                return null;
 
-                var prices = PriceRegex.Matches(line)
-                    .Select(m => ParsePrice(m.Value))
-                    .Where(v => v.HasValue)
-                    .Select(v => v!.Value)
-                    .ToList();
-
-                if (prices.Count > 0)
-                    return prices[^1];
-            }
-
-            return null;
+            return prices[^1];
         }
 
-        private static decimal? ParsePrice(string value)
+        private static decimal? ParseDecimal(string value)
         {
+            value = NormalizePriceValue(value);
+
             if (decimal.TryParse(
                 value.Replace(',', '.'),
                 System.Globalization.NumberStyles.Any,
@@ -186,65 +311,207 @@ namespace ReceiptScanner.Services
             return null;
         }
 
-        public List<RItemModel> ExtractPurchases(string rawText)
+        private static string NormalizePriceValue(string value)
         {
-            var lines = GetCleanLines(rawText);
+            value = value.Trim();
 
-            int totalIndex = lines.FindIndex(l => ContainsAny(l, LegalKeywordsTotal));
-            if (totalIndex < 0) return new List<RItemModel>();
+            var separatorIndex = Math.Max(value.LastIndexOf('.'), value.LastIndexOf(','));
+            if (separatorIndex < 0)
+                return value;
 
-            var items = new List<RItemModel>();
+            var decimalPartLength = value.Length - separatorIndex - 1;
+            if (decimalPartLength == 1)
+                value += "0";
 
-            decimal tempQty = 1;
-            decimal tempUnitPrice = 0;
-            bool hasQuantity = false;
+            return value;
+        }
 
-            for (int i = 0; i < totalIndex; i++)
+        private static bool IsValidProductLine(string line)
+        {
+            line = line.ToUpperInvariant();
+         
+            if (ContainsAny(line, InvalidProductKeywords))
+                return false;
+
+            return true;
+        }
+        private static bool IsTotalLine(string line)
+        {
+            return ContainsAny(line, TotalsSectionKeywords)
+                || line.Contains("ЗА ПЛАЩАНЕ", StringComparison.OrdinalIgnoreCase)
+                || line.Contains("ДЪЛЖИМА СУМА", StringComparison.OrdinalIgnoreCase)
+                || line.Contains("ВСИЧКО", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsProductName(string line)
+        {
+            if (line.Length < 2)
+                return false;
+
+            if (ContainsAny(line, InvalidProductKeywords))
+                return false;
+
+            if (PriceRegex.IsMatch(line))
+                return false;
+
+            if (!line.Any(char.IsLetter))
+                return false;
+
+            var lettersCount = line.Count(char.IsLetter);
+            var digitsCount = line.Count(char.IsDigit);
+
+            return lettersCount >= digitsCount;
+        }
+
+        private static bool IsProductNoiseLine(string line)
+        {
+            return ContainsAny(line, ProductNoiseKeywords)
+                || line.StartsWith("#", StringComparison.Ordinal);
+        }
+
+        private static string GetCleanProductName(string line)
+        {
+            var name = PriceRegex.Replace(line, " ");
+            name = Regex.Replace(name, @"\b\d+(?:[.,]\d+)?\s*x\s*\d+[.,]\d{1,2}\b", " ", RegexOptions.IgnoreCase);
+            name = RemoveTaxGroupSuffix(name);
+            name = Regex.Replace(name, @"(?<=\d)\s*96\b", "%");
+            name = Regex.Replace(name, @"\s+", " ").Trim(' ', '-', ':', ';', '.', ',');
+
+            return name;
+        }
+
+        private static List<decimal> ExtractPrices(string line)
+        {
+            return PriceRegex.Matches(line)
+                .Select(m => ParseDecimal(m.Value))
+                .Where(v => v.HasValue)
+                .Select(v => v!.Value)
+                .ToList();
+        }
+
+        private static bool TryReadQuantityLine(string line, out decimal quantity, out decimal unitPrice)
+        {
+            quantity = 1;
+            unitPrice = 0;
+
+            if (!QuantityRegex.IsMatch(line))
+                return false;
+
+            var numbers = Regex.Matches(line, @"\d+(?:[.,]\d+)?")
+                .Select(m => ParseDecimal(m.Value))
+                .Where(v => v.HasValue)
+                .Select(v => v!.Value)
+                .ToList();
+
+            if (numbers.Count < 2)
+                return false;
+
+            quantity = numbers[0];
+            unitPrice = numbers[1];
+            return true;
+        }
+
+        private static string RemoveTaxGroupSuffix(string name)
+        {
+            return Regex.Replace(name, @"\s+[АБВГДABVCС6]$", "", RegexOptions.IgnoreCase);
+        }
+
+        private static int FindItemsStartIndex(List<string> lines, int totalIndex)
+        {
+            var maxHeaderSearch = Math.Min(totalIndex, 12);
+
+            for (int i = 0; i < maxHeaderSearch; i++)
             {
                 var line = lines[i];
 
-                if (QuantityRegex.IsMatch(line))
+                if (line.Contains("УНП", StringComparison.OrdinalIgnoreCase)
+                    || line.Contains("КАСА", StringComparison.OrdinalIgnoreCase)
+                    || line.Contains("КАСИЕР", StringComparison.OrdinalIgnoreCase)
+                    || line.Contains("ОПЕРАТОР", StringComparison.OrdinalIgnoreCase))
                 {
-                    var numbers = Regex.Matches(line, @"\d+[.,]\d+")
-                        .Select(m => decimal.Parse(m.Value.Replace(',', '.'), System.Globalization.CultureInfo.InvariantCulture))
-                        .ToList();
+                    return i + 1;
+                }
+            }
 
-                    if (numbers.Count == 2)
-                    {
-                        tempQty = numbers[0];
-                        tempUnitPrice = numbers[1];
-                        hasQuantity = true;
-                    }
+            return 0;
+        }
+
+        public List<RItemModel> ExtractPurchases(List<string> lines)
+        {
+            int totalIndex = lines.FindIndex(IsTotalLine);
+            if (totalIndex < 0)
+                totalIndex = lines.Count;
+
+            var items = new List<RItemModel>();
+            var startIndex = FindItemsStartIndex(lines, totalIndex);
+
+            string? currentName = null;
+            decimal currentQuantity = 1;
+            decimal currentUnitPrice = 0;
+            bool hasQuantity = false;
+
+            for (int i = startIndex; i < totalIndex; i++)
+            {
+                var line = lines[i];
+
+                if (!IsValidProductLine(line))
+                    continue;
+
+                if (IsProductNoiseLine(line))
+                    continue;
+
+                if (TryReadQuantityLine(line, out var quantity, out var unitPrice))
+                {
+                    currentQuantity = quantity;
+                    currentUnitPrice = unitPrice;
+                    hasQuantity = true;
+                    continue;
+                }
+
+                var prices = ExtractPrices(line);
+
+                if (prices.Count == 0)
+                {
+                    if (IsProductName(line))
+                        currentName = GetCleanProductName(line);
 
                     continue;
                 }
 
-                var priceMatch = PriceRegex.Match(line);
+                decimal totalPrice = prices[^1];
 
-                if (!priceMatch.Success)
-                    continue;
+                string name = GetCleanProductName(line);
 
-                decimal totalPrice = decimal.Parse(
-                    priceMatch.Value.Replace(',', '.'),
-                    System.Globalization.CultureInfo.InvariantCulture);
+                if (string.IsNullOrWhiteSpace(name))
+                    name = currentName ?? "";
 
-                string name = Regex.Replace(line, @"\d+[.,]\d{2}.*$", "").Trim();
+                name = GetCleanProductName(name);
 
                 if (string.IsNullOrWhiteSpace(name) || name.Length < 2)
+                {
+                    currentName = null;
+                    hasQuantity = false;
+                    currentQuantity = 1;
+                    currentUnitPrice = 0;
+                    continue;
+                }
+
+                if (!IsValidProductLine(name))
                     continue;
 
                 items.Add(new RItemModel
                 {
                     Name = name,
-                    Quantity = hasQuantity ? tempQty : 1,
-                    UnitPrice = hasQuantity ? tempUnitPrice : totalPrice,
+                    Quantity = hasQuantity ? currentQuantity : 1,
+                    UnitPrice = hasQuantity ? currentUnitPrice : totalPrice,
                     TotalPrice = totalPrice,
                     IsWeighted = hasQuantity
                 });
 
+                currentName = null;
                 hasQuantity = false;
-                tempQty = 1;
-                tempUnitPrice = 0;
+                currentQuantity = 1;
+                currentUnitPrice = 0;
             }
 
             return items;
