@@ -7,24 +7,24 @@
         <div class="row align-items-center g-4">
             <div class="col-12 col-lg-6">
                 <h1 class="display-5 fw-bold mb-3">
-                    Scan receipts. Track expenses.
+                    Сканирай касови бележки. <br> Следи разходите си.
                 </h1>
 
                 <p class="lead text-muted mb-4">
-                    Upload receipt images, extract purchase data with OCR, save your expenses, and view spending summaries in one place.
+                    Качи снимки на касови бележки, извлечи данни за покупките чрез OCR, запази разходите си и преглеждай обобщения на харчовете си на едно място.
                 </p>
 
                 <div class="d-grid d-sm-flex gap-2">
                     <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary btn-lg">
-                        Create account
+                        Регистрирай се
                     </a>
 
                     <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-primary btn-lg">
-                        Login
+                        Вход
                     </a>
 
                     <a asp-controller="Receipt" asp-action="Upload" class="btn btn-outline-secondary btn-lg">
-                        Try scanner
+                        Изпробвай
                     </a>
                 </div>
             </div>
@@ -32,31 +32,31 @@
             <div class="col-12 col-lg-6">
                 <div class="border rounded-3 p-3 bg-light">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <strong>Receipt preview</strong>
+                        <strong>Примерна касова бележка</strong>
                         <span class="badge bg-success">OCR ready</span>
                     </div>
 
                     <div class="bg-white border rounded-3 p-3">
-                        <div class="mb-2 fw-semibold">Supermarket Example</div>
+                        <div class="mb-2 fw-semibold">Търговец</div>
 
                         <div class="d-flex justify-content-between border-bottom py-2">
-                            <span>Milk</span>
-                            <span>2.40 лв.</span>
+                            <span>Мляко</span>
+                            <span>2.40 евро</span>
                         </div>
 
                         <div class="d-flex justify-content-between border-bottom py-2">
-                            <span>Bread</span>
-                            <span>1.80 лв.</span>
+                            <span>Хляб</span>
+                            <span>1.80 евро</span>
                         </div>
 
                         <div class="d-flex justify-content-between border-bottom py-2">
-                            <span>Cheese</span>
-                            <span>6.90 лв.</span>
+                            <span>Сирене</span>
+                            <span>6.90 евро</span>
                         </div>
 
                         <div class="d-flex justify-content-between pt-3 fw-bold">
-                            <span>Total</span>
-                            <span>11.10 лв.</span>
+                            <span>Общо</span>
+                            <span>11.10 евро</span>
                         </div>
                     </div>
                 </div>
@@ -70,36 +70,36 @@
         <div class="row g-3">
             <div class="col-12 col-md-6 col-lg-3">
                 <div class="border rounded-3 p-4 h-100 bg-white">
-                    <h2 class="h5">OCR scanning</h2>
+                    <h2 class="h5">OCR извличане</h2>
                     <p class="text-muted mb-0">
-                        Extract text from receipt images using OCR processing.
+                        Извличай текст от касови бележки напълно автоматично с OCR.
                     </p>
                 </div>
             </div>
 
             <div class="col-12 col-md-6 col-lg-3">
                 <div class="border rounded-3 p-4 h-100 bg-white">
-                    <h2 class="h5">Receipt details</h2>
+                    <h2 class="h5">Детайли</h2>
                     <p class="text-muted mb-0">
-                        Detect vendor, date, totals, and purchased items.
+                        Извлечи търговец, дата, обща сума и всички покупки - бързо и лесно.
                     </p>
                 </div>
             </div>
 
             <div class="col-12 col-md-6 col-lg-3">
                 <div class="border rounded-3 p-4 h-100 bg-white">
-                    <h2 class="h5">Categories</h2>
+                    <h2 class="h5">Категории</h2>
                     <p class="text-muted mb-0">
-                        Organize products and expenses by category.
+                        Организирай разходите си в категории.
                     </p>
                 </div>
             </div>
 
             <div class="col-12 col-md-6 col-lg-3">
                 <div class="border rounded-3 p-4 h-100 bg-white">
-                    <h2 class="h5">Analytics</h2>
+                    <h2 class="h5">Анализи и отчети</h2>
                     <p class="text-muted mb-0">
-                        View monthly spending, totals, and category charts.
+                        Проследявай месечните си разходи в табличен и графичен вид.
                     </p>
                 </div>
             </div>
@@ -111,9 +111,9 @@
     <div class="container">
         <div class="row g-4 align-items-center">
             <div class="col-12 col-lg-5">
-                <h2 class="h1 mb-3">Expense overview</h2>
+                <h2 class="h1 mb-3">Преглед на разходи</h2>
                 <p class="text-muted">
-                    After receipts are saved, the dashboard can show spending statistics and charts.
+                    След като касовите бележки бъдат запазени, можеш да намериш статистиките за своите разходи в таблото в твоя профил.
                 </p>
             </div>
 
@@ -121,21 +121,22 @@
                 <div class="row g-3">
                     <div class="col-12 col-sm-4">
                         <div class="border rounded-3 p-3 text-center h-100">
-                            <div class="text-muted small">This month</div>
+                            <div class="text-muted small">Този месец</div>
                             <div class="h4 mb-0">248.60 лв.</div>
+                            <div class="h4 mb-0">127.11 евро</div>
                         </div>
                     </div>
 
                     <div class="col-12 col-sm-4">
                         <div class="border rounded-3 p-3 text-center h-100">
-                            <div class="text-muted small">Receipts</div>
+                            <div class="text-muted small">Касови бележки</div>
                             <div class="h4 mb-0">18</div>
                         </div>
                     </div>
 
                     <div class="col-12 col-sm-4">
                         <div class="border rounded-3 p-3 text-center h-100">
-                            <div class="text-muted small">Top category</div>
+                            <div class="text-muted small">Водеща категория</div>
                             <div class="h4 mb-0">Food</div>
                         </div>
                     </div>
@@ -150,6 +151,15 @@
                                 <div class="bg-primary rounded-top flex-fill" style="height: 60%;"></div>
                                 <div class="bg-primary rounded-top flex-fill" style="height: 75%;"></div>
                             </div>
+
+                            <div class="d-flex gap-2 text-center mt-2">
+                                <div class="flex-fill">Яну</div>
+                                <div class="flex-fill">Фев</div>
+                                <div class="flex-fill">Мар</div>
+                                <div class="flex-fill">Апр</div>
+                                <div class="flex-fill">Май</div>
+                                <div class="flex-fill">Юни</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -160,13 +170,13 @@
 
 <section class="py-5 bg-light">
     <div class="container text-center">
-        <h2 class="h1 mb-3">Start organizing your receipts</h2>
+        <h2 class="h1 mb-3">Започни да организираш разходите си за пазаруване</h2>
         <p class="text-muted mb-4">
-            Create an account to save scanned receipts and build your personal expense history.
+            Създай акаунт, за да запазваш касови бележки и да следиш историята на разходите си.
         </p>
 
         <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary btn-lg">
-            Create account
+            Регистрирай се
         </a>
     </div>
 </section>

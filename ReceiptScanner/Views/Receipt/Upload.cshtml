@@ -1,7 +1,7 @@
 ﻿@model ReceiptUploadModel
 
 @{
-    ViewData["Title"] = "Upload Receipt";
+    ViewData["Title"] = "Качване на касова бележка";
 }
 
 <section class="py-4 py-lg-5">
@@ -10,9 +10,9 @@
             <div class="col-12 col-xl-10">
                 <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
                     <div>
-                        <h1 class="h2 fw-bold mb-2">Upload receipt</h1>
+                        <h1 class="h2 fw-bold mb-2">Качване на касова бележка</h1>
                         <p class="text-muted mb-0">
-                            Take a receipt photo or upload an existing image, then scan it with OCR.
+                            Направи снимка на касова бележка или качи съществуващо изображение, след което я сканирай чрез OCR.
                         </p>
                     </div>
                 </div>
@@ -26,16 +26,16 @@
                         <div class="col-12 col-lg-7">
                             <div class="border rounded-3 p-3 p-md-4 h-100">
                                 <label class="form-label fw-semibold">
-                                    Receipt image
+                                    Изображение на касова бележка
                                 </label>
 
                                 <div class="d-grid d-sm-flex gap-2 mb-3">
                                     <button class="btn btn-primary" type="button" id="takePhotoBtn">
-                                        Take photo
+                                        Направи снимка
                                     </button>
 
                                     <button class="btn btn-outline-primary" type="button" id="chooseFileBtn">
-                                        Choose image
+                                        Избери изображение
                                     </button>
                                 </div>
 
@@ -48,7 +48,7 @@
                                     <div class="crop-container d-flex align-items-center justify-content-center">
                                         <img id="image" class="img-fluid" alt="" />
                                         <div id="emptyPreview" class="text-muted text-center p-5">
-                                            Take a photo or choose a receipt image to preview and crop it here.
+                                            Направи снимка или избери изображение на касова бележка, за да го прегледаш и изрежеш тук.
                                         </div>
                                     </div>
                                 </div>
@@ -57,36 +57,43 @@
 
                         <div class="col-12 col-lg-5">
                             <div class="border rounded-3 p-3 p-md-4 h-100">
-                                <h2 class="h5 fw-semibold mb-3">OCR language</h2>
+                                <h2 class="h5 fw-semibold mb-3">OCR език</h2>
 
                                 <div class="vstack gap-2">
                                     <label class="border rounded-3 p-3 d-flex gap-2">
                                         <input class="form-check-input mt-1" type="radio" name="Language" value="bul+eng" checked>
                                         <span>
-                                            <span class="d-block fw-semibold">Bulgarian and English</span>
-                                            <span class="d-block text-muted small">Best option for mixed receipts.</span>
+                                            <span class="d-block fw-semibold">Български и английски</span>
+                                            <span class="d-block text-muted small">Най-добрият избор за смесени касови бележки.</span>
                                         </span>
                                     </label>
 
                                     <label class="border rounded-3 p-3 d-flex gap-2">
                                         <input class="form-check-input mt-1" type="radio" name="Language" value="bul">
                                         <span>
-                                            <span class="d-block fw-semibold">Bulgarian</span>
-                                            <span class="d-block text-muted small">Use for Bulgarian-only receipts.</span>
+                                            <span class="d-block fw-semibold">Български</span>
+                                            <span class="d-block text-muted small">Използвай за касови бележки само на български.</span>
                                         </span>
                                     </label>
 
                                     <label class="border rounded-3 p-3 d-flex gap-2">
                                         <input class="form-check-input mt-1" type="radio" name="Language" value="eng">
                                         <span>
-                                            <span class="d-block fw-semibold">English</span>
-                                            <span class="d-block text-muted small">Use for English-only receipts.</span>
+                                            <span class="d-block fw-semibold">Английски</span>
+                                            <span class="d-block text-muted small">Използвай за касови бележки само на английски.</span>
                                         </span>
                                     </label>
                                 </div>
 
+                                <div class="form-check form-switch mt-4">
+                                    <input class="form-check-input" asp-for="UsePreprocessing" type="checkbox" />
+                                    <label class="form-check-label" asp-for="UsePreprocessing">
+                                        Image preprocessing
+                                    </label>
+                                </div>
+
                                 <button class="btn btn-success btn-lg w-100 mt-4" id="scanBtn" type="button">
-                                    Scan receipt
+                                    Сканирай касова бележка
                                 </button>
 
                                 @if (ViewBag.Message != null)
@@ -108,14 +115,16 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title fs-5" id="uploadErrorModalLabel">Image upload error</h2>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h2 class="modal-title fs-5" id="uploadErrorModalLabel">Грешка при качване на изображение</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Затвори"></button>
             </div>
             <div class="modal-body" id="uploadErrorMessage">
-                Unsupported image format. Please upload a JPG, PNG, or BMP receipt image.
+                Неподдържан формат на изображението. Моля, качи JPG, PNG или BMP изображение на касова бележка.
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Choose another image</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    Избери друго изображение
+                </button>
             </div>
         </div>
     </div>

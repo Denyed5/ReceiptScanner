@@ -1,25 +1,31 @@
 ﻿@model ReceiptScanner.Models.ReceiptModel
 
 @{
-    ViewData["Title"] = "Receipt Details";
+    ViewData["Title"] = "Детайли за касовата бележка";
 }
 
 <section class="py-4 py-lg-5">
     <div class="container">
         <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
             <div>
-                <h1 class="h2 fw-bold mb-2">Receipt details</h1>
+                <h1 class="h2 fw-bold mb-2">Детайли за касовата бележка</h1>
+
                 <p class="text-muted mb-0">
-                    Review the saved receipt summary and extracted items.
+                    Прегледай запазеното обобщение и извлечените продукти.
                 </p>
             </div>
-
-            <div class="d-grid d-md-flex gap-2">
-                <a asp-controller="Receipt" asp-action="Edit" asp-route-id="@Model.ReceiptId" class="btn btn-primary btn-lg">
-                    Edit receipt
+            <div class="d-flex gap-2 align-items-end pb-1">
+                <a asp-controller="Receipt"
+                   asp-action="Edit"
+                   asp-route-id="@Model.ReceiptId"
+                   class="btn btn-primary px-3 py-2">
+                    Редактирай
                 </a>
-                <a asp-controller="Receipt" asp-action="History" class="btn btn-outline-secondary btn-lg">
-                    Back to history
+
+                <a asp-controller="Receipt"
+                   asp-action="History"
+                   class="btn btn-outline-secondary px-3 py-2">
+                    Назад
                 </a>
             </div>
         </div>
@@ -27,27 +33,39 @@
         <div class="row g-4">
             <div class="col-12 col-lg-4">
                 <div class="border rounded-3 p-3 p-md-4 h-100">
-                    <h2 class="h5 fw-semibold mb-3">Summary</h2>
+                    <h2 class="h5 fw-semibold mb-3">Обобщение</h2>
 
                     <div class="vstack gap-3">
                         <div>
-                            <div class="text-muted small">Vendor</div>
-                            <div class="fw-semibold">@(Model.VendorName ?? "Unknown vendor")</div>
+                            <div class="text-muted small">Търговец</div>
+
+                            <div class="fw-semibold">
+                                @(Model.VendorName ?? "Неизвестен търговец")
+                            </div>
                         </div>
 
                         <div>
-                            <div class="text-muted small">Date</div>
-                            <div class="fw-semibold">@(Model.Date?.ToString("dd.MM.yyyy HH:mm") ?? "-")</div>
+                            <div class="text-muted small">Дата</div>
+
+                            <div class="fw-semibold">
+                                @(Model.Date?.ToString("dd.MM.yyyy HH:mm") ?? "-")
+                            </div>
                         </div>
 
                         <div>
-                            <div class="text-muted small">Total BGN</div>
-                            <div class="fw-semibold">@((Model.TotalBGN ?? 0).ToString("0.00")) лв.</div>
+                            <div class="text-muted small">Общо в лева</div>
+
+                            <div class="fw-semibold">
+                                @((Model.TotalBGN ?? 0).ToString("0.00")) лв.
+                            </div>
                         </div>
 
                         <div>
-                            <div class="text-muted small">Total EUR</div>
-                            <div class="fw-semibold">@((Model.TotalEUR ?? 0).ToString("0.00")) EUR</div>
+                            <div class="text-muted small">Общо в евро</div>
+
+                            <div class="fw-semibold">
+                                @((Model.TotalEUR ?? 0).ToString("0.00")) EUR
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -55,11 +73,13 @@
 
             <div class="col-12 col-lg-8">
                 <div class="border rounded-3 p-3 p-md-4 h-100">
-                    <h2 class="h5 fw-semibold mb-3">Items</h2>
+                    <h2 class="h5 fw-semibold mb-3">Продукти</h2>
 
                     @if (Model.Items.Count == 0)
                     {
-                        <p class="text-muted mb-0">No items were saved for this receipt.</p>
+                        <p class="text-muted mb-0">
+                            Няма запазени продукти за тази касова бележка.
+                        </p>
                     }
                     else
                     {
@@ -67,11 +87,15 @@
                             <table class="table align-middle mb-0">
                                 <thead>
                                     <tr>
-                                        <th>Product</th>
-                                        <th class="text-end">Qty</th>
-                                        <th class="text-end">Unit price</th>
-                                        <th class="text-end">Total</th>
-                                        <th>Category</th>
+                                        <th>Продукт</th>
+
+                                        <th class="text-end">Количество</th>
+
+                                        <th class="text-end">Ед. цена</th>
+
+                                        <th class="text-end">Общо</th>
+
+                                        <th>Категория</th>
                                     </tr>
                                 </thead>
 
@@ -80,10 +104,22 @@
                                     {
                                         <tr>
                                             <td>@item.Name</td>
-                                            <td class="text-end">@item.Quantity.ToString("0.##")</td>
-                                            <td class="text-end">@item.UnitPrice.ToString("0.00")</td>
-                                            <td class="text-end">@item.TotalPrice.ToString("0.00")</td>
-                                            <td>@(item.Category?.Name ?? "No category")</td>
+
+                                            <td class="text-end">
+                                                @item.Quantity.ToString("0.##")
+                                            </td>
+
+                                            <td class="text-end">
+                                                @item.UnitPrice.ToString("0.00")
+                                            </td>
+
+                                            <td class="text-end">
+                                                @item.TotalPrice.ToString("0.00")
+                                            </td>
+
+                                            <td>
+                                                @(item.Category?.Name ?? "Без категория")
+                                            </td>
                                         </tr>
                                     }
                                 </tbody>
@@ -95,7 +131,7 @@
 
             <div class="col-12">
                 <div class="border rounded-3 p-3 p-md-4">
-                    <h2 class="h5 fw-semibold mb-3">Raw OCR text</h2>
+                    <h2 class="h5 fw-semibold mb-3">Суров OCR текст</h2>
 
                     @if (!string.IsNullOrWhiteSpace(Model.RawText))
                     {
@@ -103,10 +139,82 @@
                     }
                     else
                     {
-                        <p class="text-muted mb-0">No raw OCR text was saved for this receipt.</p>
+                        <p class="text-muted mb-0">
+                            Няма запазен суров OCR текст за тази касова бележка.
+                        </p>
                     }
+                </div>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
+            {
+                <div class="col-12">
+                    <div class="border rounded-3 p-3 p-md-4">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mb-3">
+                            <h2 class="h5 fw-semibold mb-0">Снимка на касовата бележка</h2>
+                            <span class="text-muted small">Натисни снимката за по-голям преглед.</span>
+                        </div>
+
+                        <button type="button"
+                                class="receipt-image-frame"
+                                data-bs-toggle="modal"
+                                data-bs-target="#receiptImageModal"
+                                aria-label="Отвори снимката на касовата бележка">
+                            <img src="@Url.Action("Image", "Receipt", new { id = Model.ReceiptId })"
+                                 class="receipt-image-preview"
+                                 alt="Снимка на касова бележка" />
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+@if (!string.IsNullOrWhiteSpace(Model.ImagePath))
+{
+    <div class="modal fade" id="receiptImageModal" tabindex="-1" aria-labelledby="receiptImageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-md-down modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="receiptImageModalLabel">Снимка на касовата бележка</h2>
+                    <div class="receipt-image-tools ms-auto me-2" aria-label="Управление на увеличението">
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-sm receipt-zoom-btn"
+                                data-receipt-zoom="out"
+                                aria-label="Отдалечи"
+                                title="Отдалечи">
+                            -
+                        </button>
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-sm receipt-zoom-btn"
+                                data-receipt-zoom="reset"
+                                aria-label="Нулирай увеличението"
+                                title="Нулирай увеличението">
+                            1:1
+                        </button>
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-sm receipt-zoom-btn"
+                                data-receipt-zoom="in"
+                                aria-label="Приближи"
+                                title="Приближи">
+                            +
+                        </button>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Затвори"></button>
+                </div>
+                <div class="modal-body receipt-image-modal-body">
+                    <div class="receipt-image-zoom-canvas" id="receiptImageZoomCanvas">
+                        <img src="@Url.Action("Image", "Receipt", new { id = Model.ReceiptId })"
+                             class="receipt-image-full"
+                             id="receiptImageFull"
+                             alt="Снимка на касова бележка" />
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
+}
+
+@section Scripts {
+    <script src="~/js/receipt-details.js" asp-append-version="true"></script>
+}

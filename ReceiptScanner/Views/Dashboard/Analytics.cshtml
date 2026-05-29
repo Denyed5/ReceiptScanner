@@ -1,0 +1,228 @@
+﻿@model ReceiptScanner.Models.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Анализи";
+}
+
+<section class="py-4 py-lg-5">
+    <div class="container">
+
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+            <div>
+                <h1 class="display-6 fw-bold mb-2">
+                    Анализ на разходите
+                </h1>
+
+                <p class="text-muted mb-0">
+                    Графично представяне на потребителските разходи и тяхното разпределение.
+                </p>
+            </div>
+
+            <a asp-controller="Dashboard"
+               asp-action="Dashboard"
+               class="btn btn-outline-secondary">
+                Назад към таблото
+            </a>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- Разходи по категории -->
+            <div class="col-12 col-xl-6">
+                <div class="border rounded-4 p-4 shadow-sm h-100 bg-white">
+                    <h2 class="h5 fw-semibold mb-4">
+                        Разходи по категории
+                    </h2>
+
+                    @if (Model.CategoryTotals.Count == 0)
+                    {
+                        <p class="text-muted mb-0">
+                            Няма налични данни за категории.
+                        </p>
+                    }
+                    else
+                    {
+                        <canvas id="categoryChart"></canvas>
+                    }
+                </div>
+            </div>
+
+            <!-- Месечни разходи -->
+            <div class="col-12 col-xl-6">
+                <div class="border rounded-4 p-4 shadow-sm h-100 bg-white">
+                    <h2 class="h5 fw-semibold mb-4">
+                        Месечни разходи
+                    </h2>
+
+                    @if (Model.MonthlyTotals.Count == 0)
+                    {
+                        <p class="text-muted mb-0">
+                            Няма налични месечни данни.
+                        </p>
+                    }
+                    else
+                    {
+                        <canvas id="monthlyChart"></canvas>
+                    }
+                </div>
+            </div>
+
+            <!-- Най-големи разходи -->
+            <div class="col-12">
+                <div class="border rounded-4 p-4 shadow-sm bg-white">
+                    <h2 class="h5 fw-semibold mb-4">
+                        Категории с най-големи разходи
+                    </h2>
+
+                    @if (Model.CategoryTotals.Count == 0)
+                    {
+                        <p class="text-muted mb-0">
+                            Няма налични данни за категории.
+                        </p>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Категория</th>
+                                        <th class="text-end">Сума</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach (var category in Model.CategoryTotals
+                                   .OrderByDescending(c => c.Value))
+                                    {
+                                        <tr>
+                                            <td>@category.Key</td>
+
+                                            <td class="text-end">
+                                                @category.Value.ToString("0.00") лв.
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts
+{
+    <script>
+
+        // =========================
+        // Графика по категории
+        // =========================
+
+        const categoryLabels = [
+            @Html.Raw(string.Join(",",
+                    Model.CategoryTotals.Keys
+                            .Select(c => $"'{c}'")))
+        ];
+
+        const categoryValues = [
+            @string.Join(",",
+                    Model.CategoryTotals.Values)
+        ];
+
+        const categoryCtx =
+            document.getElementById('categoryChart');
+
+        if (categoryCtx) {
+
+            new Chart(categoryCtx, {
+
+                type: 'doughnut',
+
+                data: {
+
+                    labels: categoryLabels,
+
+                    datasets: [{
+                        label: 'Разходи',
+
+                        data: categoryValues,
+
+                        borderWidth: 1
+                    }]
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // =========================
+        // Месечни разходи
+        // =========================
+
+        const monthlyLabels = [
+            @Html.Raw(string.Join(",",
+                    Model.MonthlyTotals.Keys
+                            .Select(m => $"'{m}'")))
+        ];
+
+        const monthlyValues = [
+            @string.Join(",",
+                    Model.MonthlyTotals.Values)
+        ];
+
+        const monthlyCtx =
+            document.getElementById('monthlyChart');
+
+        if (monthlyCtx) {
+
+            new Chart(monthlyCtx, {
+
+                type: 'bar',
+
+                data: {
+
+                    labels: monthlyLabels,
+
+                    datasets: [{
+                        label: 'Месечни разходи',
+
+                        data: monthlyValues,
+
+                        borderWidth: 1
+                    }]
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+    </script>
+}

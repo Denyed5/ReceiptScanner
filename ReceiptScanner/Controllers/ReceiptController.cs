@@ -12,7 +12,7 @@ namespace ReceiptScanner.Controllers
     public class ReceiptController : Controller
     {
         private const decimal EurToBgnRate = 1.95583m;
-        private const string UnsupportedImageMessage = "Unsupported image format. Please upload a JPG, PNG, or BMP receipt image.";
+        private const string UnsupportedImageMessage = "Неподдържан формат. Системата поддържа само JPG, PNG и BMP изображения.";
 
         private static readonly HashSet<string> SupportedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -33,14 +33,19 @@ namespace ReceiptScanner.Controllers
         private readonly ReceiptParserService _parser;
         private readonly ImagePreprocessingService _preprocessing;
         private readonly ReceiptScannerContext _context;
-
+        private readonly CategoryDetectionService _categoryDetectionService;
+        private readonly IWebHostEnvironment _env;
         public ReceiptController(OcrService ocr, ReceiptParserService parser,
-                                 ImagePreprocessingService preprocessing, ReceiptScannerContext context)
+                                 ImagePreprocessingService preprocessing, ReceiptScannerContext context, 
+                                 CategoryDetectionService categoryDetectionService,
+                                 IWebHostEnvironment env)
         {
             _ocr = ocr;
             _parser = parser;
             _preprocessing = preprocessing;
             _context = context;
+            _categoryDetectionService = categoryDetectionService;
+            _env = env;
         }
 
         [HttpGet]
@@ -140,6 +145,47 @@ namespace ReceiptScanner.Controllers
         }
 
         [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Image(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return NotFound();
+            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Redirect("/Identity/Account/Login");
+            }
+
+            var receipt = await _context.Receipts
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.ReceiptId == id && r.UserId == userId);
+
+            if (receipt == null || string.IsNullOrWhiteSpace(receipt.ImagePath))
+            {
+                return NotFound();
+            }
+
+            var fullPath = GetStoredImageFullPath(receipt.ImagePath);
+            var allowedRoot = Path.GetFullPath(Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages"));
+
+            if (!fullPath.StartsWith(allowedRoot, StringComparison.OrdinalIgnoreCase))
+            {
+                return NotFound();
+            }
+
+            if (!System.IO.File.Exists(fullPath))
+            {
+                return NotFound();
+            }
+
+            return PhysicalFile(fullPath, "image/png");
+        }
+
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ReceiptModel model)
@@ -160,12 +206,12 @@ namespace ReceiptScanner.Controllers
 
             if (!model.TotalBGN.HasValue)
             {
-                ModelState.AddModelError(nameof(ReceiptModel.TotalBGN), "Total in BGN is required.");
+                ModelState.AddModelError(nameof(ReceiptModel.TotalBGN), "Обща сума в лева е задължителна.");
             }
 
             if (!model.TotalEUR.HasValue)
             {
-                ModelState.AddModelError(nameof(ReceiptModel.TotalEUR), "Total in EUR is required.");
+                ModelState.AddModelError(nameof(ReceiptModel.TotalEUR), "Обща сума в евро е задължителна.");
             }
 
             if (!ModelState.IsValid)
@@ -244,6 +290,18 @@ namespace ReceiptScanner.Controllers
             _context.Receipts.Remove(receipt);
             await _context.SaveChangesAsync();
 
+            if (!string.IsNullOrWhiteSpace(receipt.ImagePath))
+            {
+                var imageFullPath = GetStoredImageFullPath(receipt.ImagePath);
+                var allowedRoot = Path.GetFullPath(Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages"));
+
+                if (imageFullPath.StartsWith(allowedRoot, StringComparison.OrdinalIgnoreCase)
+                    && System.IO.File.Exists(imageFullPath))
+                {
+                    System.IO.File.Delete(imageFullPath);
+                }
+            }
+
             return RedirectToAction(nameof(History));
         }
 
@@ -253,7 +311,7 @@ namespace ReceiptScanner.Controllers
         {
             byte[] imageBytes;
 
-            if (!string.IsNullOrEmpty(croppedImage))
+            if (!string.IsNullOrEmpty(croppedImage)) 
             {
                 try
                 {
@@ -262,7 +320,7 @@ namespace ReceiptScanner.Controllers
                 }
                 catch (Exception ex) when (ex is FormatException or IndexOutOfRangeException)
                 {
-                    return UploadViewWithError(model, "The cropped image could not be read. Please choose the image again.");
+                    return UploadViewWithError(model, "Изображението не може да бъде прочетено.");
                 }
             }
             else
@@ -310,17 +368,44 @@ namespace ReceiptScanner.Controllers
                 finalBytes = image.ToBytes(".png");
             }
 
+            var tempImageDirectory = Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages", "Temp");
+            Directory.CreateDirectory(tempImageDirectory);
+
+            var tempImageFileName = $"{Guid.NewGuid():N}.png";
+            var tempImageFullPath = Path.Combine(tempImageDirectory, tempImageFileName);
+
+            await System.IO.File.WriteAllBytesAsync(tempImageFullPath, finalBytes);
+
+            var tempImagePath = Path.Combine("App_Data", "ReceiptImages", "Temp", tempImageFileName);
+
             var result = await _ocr.ReadText(finalBytes, model.Language);
 
-            string? vendorLine = _parser.ExtractVendorLine(result.RawText, 5);
+            result.ImagePath = tempImagePath;
+
+            var lines = _parser.GetCleanLines(result.RawText);
+            string? vendorLine = _parser.ExtractVendorLine(lines, 5);
             if (vendorLine == "Не може да бъде извлечен.")
             {
                 vendorLine = null;
             }
-            DateTime? date = _parser.ExtractDateTime(result.RawText);
-            decimal? totalBGN = _parser.ExtractTotalSumBGN(result.RawText);
-            decimal? totalEUR = _parser.ExtractTotalSumEUR(result.RawText);
-            List<RItemModel> items = _parser.ExtractPurchases(result.RawText);
+            DateTime? date = _parser.ExtractDateTime(lines);
+            decimal? totalBGN = _parser.ExtractTotalSumBGN(lines);
+            decimal? totalEUR = _parser.ExtractTotalSumEUR(lines);
+            List<RItemModel> items = _parser.ExtractPurchases(lines);
+
+            foreach (var item in items)
+            {
+                var detection =
+                    await _categoryDetectionService
+                        .DetectCategoryAsync(item.Name);
+
+                item.CategoryId =
+                    detection.CategoryId;
+
+                item.IsCategorySuggested =
+                    detection.IsSuggested;
+            }
+
             List<string>? cleanLines = _parser.GetCleanLines(result.RawText);
 
             result.RawTextLines = cleanLines;
@@ -369,6 +454,8 @@ namespace ReceiptScanner.Controllers
 
                 return View("Result", model);
             }
+
+            model.ImagePath = MoveTempReceiptImageToUserStorage(model.ImagePath, model.UserId, model.ReceiptId);
 
             foreach (var item in model.Items)
             {
@@ -432,6 +519,58 @@ namespace ReceiptScanner.Controllers
         {
             ViewBag.UploadErrorMessage = message;
             return View("Upload", model);
+        }
+
+        private string GetReceiptImagesDirectory(string userId)
+        {
+            return Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages", GetSafePathSegment(userId));
+        }
+
+        private string GetReceiptImageRelativePath(string userId, string fileName)
+        {
+            return Path.Combine("App_Data", "ReceiptImages", GetSafePathSegment(userId), fileName);
+        }
+
+        private string GetStoredImageFullPath(string imagePath)
+        {
+            return Path.GetFullPath(Path.Combine(_env.ContentRootPath, imagePath));
+        }
+
+        private string? MoveTempReceiptImageToUserStorage(string? tempImagePath, string userId, string receiptId)
+        {
+            if (string.IsNullOrWhiteSpace(tempImagePath))
+            {
+                return null;
+            }
+
+            var tempFullPath = GetStoredImageFullPath(tempImagePath);
+            var tempRoot = Path.GetFullPath(Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages", "Temp"));
+
+            if (!tempFullPath.StartsWith(tempRoot, StringComparison.OrdinalIgnoreCase)
+                || !System.IO.File.Exists(tempFullPath))
+            {
+                return null;
+            }
+
+            var userImageDirectory = GetReceiptImagesDirectory(userId);
+            Directory.CreateDirectory(userImageDirectory);
+
+            var finalFileName = $"{receiptId}.png";
+            var finalFullPath = Path.Combine(userImageDirectory, finalFileName);
+
+            System.IO.File.Move(tempFullPath, finalFullPath, overwrite: true);
+
+            return GetReceiptImageRelativePath(userId, finalFileName);
+        }
+
+        private static string GetSafePathSegment(string value)
+        {
+            foreach (var invalidChar in Path.GetInvalidFileNameChars())
+            {
+                value = value.Replace(invalidChar, '_');
+            }
+
+            return value;
         }
     }
 }

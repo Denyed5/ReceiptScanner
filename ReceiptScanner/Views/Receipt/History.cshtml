@@ -1,7 +1,7 @@
 ﻿@model List<ReceiptScanner.Models.ReceiptModel>
 
 @{
-    ViewData["Title"] = "Receipt History";
+    ViewData["Title"] = "История на касовите бележки";
 
     string sortBy = ViewBag.SortBy as string ?? "date";
     string sortDirection = ViewBag.SortDirection as string ?? "desc";
@@ -21,15 +21,15 @@
     <div class="container">
         <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
             <div>
-                <h1 class="h2 fw-bold mb-2">Receipt history</h1>
+                <h1 class="h2 fw-bold mb-2">История на касовите бележки</h1>
                 <p class="text-muted mb-0">
-                    View your saved receipts and open each receipt to see its items.
+                    Преглеждай запазените си касови бележки и отвори всяка бележка, за да видиш продуктите в нея.
                 </p>
             </div>
 
             <div class="d-grid d-md-block">
                 <a asp-controller="Receipt" asp-action="Upload" class="btn btn-primary btn-lg">
-                    Scan receipt
+                    Сканирай касова бележка
                 </a>
             </div>
         </div>
@@ -37,12 +37,13 @@
         @if (Model.Count == 0)
         {
             <div class="border rounded-3 p-4 p-md-5 text-center">
-                <h2 class="h4 fw-semibold mb-2">No saved receipts</h2>
+                <h2 class="h4 fw-semibold mb-2">Няма запазени касови бележки</h2>
                 <p class="text-muted mb-4">
-                    Your saved receipts will appear here after you scan and confirm them.
+                    Тук ще се появят запазените касови бележки, след като ги сканираш и потвърдиш.
                 </p>
+
                 <a asp-controller="Receipt" asp-action="Upload" class="btn btn-primary btn-lg">
-                    Scan your first receipt
+                    Сканирай първата си касова бележка
                 </a>
             </div>
         }
@@ -53,28 +54,33 @@
                     <table class="table align-middle mb-0">
                         <thead>
                             <tr>
-                                <th style="width: 70px;">No.</th>
-                                <th>Vendor</th>
+                                <th style="width: 70px;">№</th>
+
+                                <th>Търговец</th>
+
                                 <th>
                                     <a asp-controller="Receipt"
-                                           asp-action="History"
-                                           asp-route-sortBy="date"
-                                           asp-route-sortDirection="@NextDirection("date")"
-                                           class="link-dark text-decoration-none">
-                                        Date
+                                       asp-action="History"
+                                       asp-route-sortBy="date"
+                                       asp-route-sortDirection="@NextDirection("date")"
+                                       class="link-dark text-decoration-none">
+                                        Дата
                                     </a>
                                 </th>
+
                                 <th class="text-end">
                                     <a asp-controller="Receipt"
-                                           asp-action="History"
-                                           asp-route-sortBy="total"
-                                           asp-route-sortDirection="@NextDirection("total")"
-                                           class="link-dark text-decoration-none">
-                                        Total BGN
+                                       asp-action="History"
+                                       asp-route-sortBy="total"
+                                       asp-route-sortDirection="@NextDirection("total")"
+                                       class="link-dark text-decoration-none">
+                                        Общо в лева
                                     </a>
                                 </th>
-                                <th class="text-end">Total EUR</th>
-                                <th class="text-end">Action</th>
+
+                                <th class="text-end">Общо в евро</th>
+
+                                <th class="text-end">Действие</th>
                             </tr>
                         </thead>
 
@@ -85,24 +91,33 @@
 
                                 <tr>
                                     <td>@(i + 1)</td>
-                                    <td>@(receipt.VendorName ?? "Unknown vendor")</td>
+
+                                    <td>@(receipt.VendorName ?? "Неизвестен търговец")</td>
+
                                     <td>@(receipt.Date?.ToString("dd.MM.yyyy HH:mm") ?? "-")</td>
-                                    <td class="text-end">@((receipt.TotalBGN ?? 0).ToString("0.00")) лв.</td>
-                                    <td class="text-end">@((receipt.TotalEUR ?? 0).ToString("0.00")) EUR</td>
+
+                                    <td class="text-end">
+                                        @((receipt.TotalBGN ?? 0).ToString("0.00")) лв.
+                                    </td>
+
+                                    <td class="text-end">
+                                        @((receipt.TotalEUR ?? 0).ToString("0.00")) EUR
+                                    </td>
+
                                     <td class="text-end">
                                         <div class="receipt-action-buttons">
                                             <a asp-controller="Receipt"
-                                                   asp-action="Details"
-                                                   asp-route-id="@receipt.ReceiptId"
-                                                   class="btn btn-outline-primary btn-sm">
-                                                Open
+                                               asp-action="Details"
+                                               asp-route-id="@receipt.ReceiptId"
+                                               class="btn btn-outline-primary btn-sm">
+                                                Детайли
                                             </a>
 
                                             <a asp-controller="Receipt"
-                                                   asp-action="Edit"
-                                                   asp-route-id="@receipt.ReceiptId"
-                                                   class="btn btn-outline-secondary btn-sm">
-                                                Edit
+                                               asp-action="Edit"
+                                               asp-route-id="@receipt.ReceiptId"
+                                               class="btn btn-outline-secondary btn-sm">
+                                                Редактирай
                                             </a>
 
                                             <button type="button"
@@ -110,8 +125,8 @@
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#deleteReceiptModal"
                                                     data-receipt-id="@receipt.ReceiptId"
-                                                    data-receipt-name="@(receipt.VendorName ?? "Unknown vendor")">
-                                                Delete
+                                                    data-receipt-name="@(receipt.VendorName ?? "Неизвестен търговец")">
+                                                Изтрий
                                             </button>
                                         </div>
                                     </td>
@@ -125,28 +140,51 @@
     </div>
 </section>
 
-<div class="modal fade" id="deleteReceiptModal" tabindex="-1" aria-labelledby="deleteReceiptModalLabel" aria-hidden="true">
+<div class="modal fade"
+     id="deleteReceiptModal"
+     tabindex="-1"
+     aria-labelledby="deleteReceiptModalLabel"
+     aria-hidden="true">
+
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
+
             <div class="modal-header">
-                <h2 class="modal-title h5" id="deleteReceiptModalLabel">Delete receipt</h2>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h2 class="modal-title h5" id="deleteReceiptModalLabel">
+                    Изтриване на касова бележка
+                </h2>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Затвори">
+                </button>
             </div>
 
             <div class="modal-body">
-                Are you sure you want to delete <strong id="deleteReceiptName">this receipt</strong>? This action cannot be undone.
+                Сигурни ли сте, че искате да изтриете
+                <strong id="deleteReceiptName">тази касова бележка</strong>?
+                Това действие не може да бъде отменено.
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    Cancel
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    Отказ
                 </button>
 
-                <form asp-controller="Receipt" asp-action="Delete" method="post" class="m-0">
+                <form asp-controller="Receipt"
+                      asp-action="Delete"
+                      method="post"
+                      class="m-0">
+
                     @Html.AntiForgeryToken()
+
                     <input type="hidden" name="id" id="deleteReceiptId" />
+
                     <button type="submit" class="btn btn-danger">
-                        Delete receipt
+                        Изтрий касовата бележка
                     </button>
                 </form>
             </div>

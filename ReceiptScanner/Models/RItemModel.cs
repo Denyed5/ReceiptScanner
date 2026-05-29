@@ -23,5 +23,7 @@ namespace ReceiptScanner.Models
         [NotMapped]
         public bool HasInvalidTotal =>
         Math.Round(Quantity * UnitPrice, 2) != Math.Round(TotalPrice, 2);
+        [NotMapped]
+        public bool IsCategorySuggested { get; set; }
     }
 }

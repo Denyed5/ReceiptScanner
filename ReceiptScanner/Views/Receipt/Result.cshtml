@@ -1,246 +1,306 @@
-﻿@model ReceiptScanner.Models.ReceiptModel
+﻿    @model ReceiptScanner.Models.ReceiptModel
 
-@{
-    ViewData["Title"] = "OCR Result";
-}
+    @{
+        ViewData["Title"] = "OCR Резултат";
+    }
 
-<section class="py-4 py-lg-5">
-    <div class="container">
-        @using (Html.BeginForm("ConfirmReceipt", "Receipt", FormMethod.Post))
-        {
-            @Html.AntiForgeryToken()
-            <input asp-for="RawText" type="hidden" />
-            <input asp-for="IsDateSuggested" type="hidden" />
-            <input asp-for="IsTotalBGNSuggested" type="hidden" />
-            <input asp-for="IsTotalEURSuggested" type="hidden" />
+    <section class="py-4 py-lg-5">
+        <div class="container">
+            @using (Html.BeginForm("ConfirmReceipt", "Receipt", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <input asp-for="ImagePath" type="hidden" />
+                <input asp-for="RawText" type="hidden" />
+                <input asp-for="IsDateSuggested" type="hidden" />
+                <input asp-for="IsTotalBGNSuggested" type="hidden" />
+                <input asp-for="IsTotalEURSuggested" type="hidden" />
 
-            <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
-                <div>
-                    <h1 class="h2 fw-bold mb-2">Review OCR result</h1>
-                    <p class="text-muted mb-0">
-                        Check the extracted receipt data, fix mistakes, add missing items, or remove incorrect rows.
-                    </p>
+                <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+                    <div>
+                        <h1 class="h2 fw-bold mb-2">Преглед на OCR резултата</h1>
+                        <p class="text-muted mb-0">
+                            Провери извлечените данни от касовата бележка, коригирай грешки, добави липсващи продукти или премахни грешни редове.
+                        </p>
+                    </div>
+
+                    <div class="d-grid d-md-block">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            Потвърди и запази
+                        </button>
+                    </div>
                 </div>
 
-                <div class="d-grid d-md-block">
-                    <button type="submit" class="btn btn-success btn-lg">
-                        Confirm and save
-                    </button>
-                </div>
-            </div>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                <div class="row g-4">
+                    <div class="col-12 col-lg-4">
+                        <div class="border rounded-3 p-3 p-md-4 h-100">
+                            <h2 class="h5 fw-semibold mb-3">Обобщение на касовата бележка</h2>
 
-            <div class="row g-4">
-                <div class="col-12 col-lg-4">
-                    <div class="border rounded-3 p-3 p-md-4 h-100">
-                        <h2 class="h5 fw-semibold mb-3">Receipt summary</h2>
+                            <div class="mb-3">
+                                <label asp-for="VendorName" class="form-label">Търговец</label>
+                                <input asp-for="VendorName" class="form-control" />
+                                <span asp-validation-for="VendorName" class="text-danger small"></span>
+                            </div>
 
-                        <div class="mb-3">
-                            <label asp-for="VendorName" class="form-label">Vendor</label>
-                            <input asp-for="VendorName" class="form-control" />
-                            <span asp-validation-for="VendorName" class="text-danger small"></span>
-                        </div>
+                            <div class="mb-3">
+                                <label asp-for="Date" class="form-label">Дата</label>
 
-                        <div class="mb-3">
-                            <label asp-for="Date" class="form-label">Date</label>
+                                <input asp-for="Date"
+                                       type="datetime-local"
+                                       asp-format="{0:yyyy-MM-ddTHH:mm}"
+                                       class="form-control @(Model.IsDateSuggested ? "suggested-field" : "")" />
 
-                            <input asp-for="Date"
-                                   type="datetime-local"
-                                   asp-format="{0:yyyy-MM-ddTHH:mm}"
-                                   class="form-control @(Model.IsDateSuggested ? "suggested-field" : "")" />
+                                <span asp-validation-for="Date" class="text-danger small"></span>
 
-                            <span asp-validation-for="Date" class="text-danger small"></span>
-
-                            @if (Model.IsDateSuggested)
-                            {
-                                <div class="form-text text-warning-emphasis">
-                                    Date was not detected, so the current date and time were suggested.
-                                </div>
-                            }
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="TotalBGN" class="form-label">Total in BGN</label>
-                            <input asp-for="TotalBGN" class="form-control @(Model.IsTotalBGNSuggested ? "suggested-field" : "")" />
-                            <span asp-validation-for="TotalBGN" class="text-danger small"></span>
-                            @if (Model.IsTotalBGNSuggested)
-                            {
-                                <div class="form-text text-warning-emphasis">
-                                    BGN total was calculated from EUR using the fixed conversion rate.
-                                </div>
-                            }
-                        </div>
+                                @if (Model.IsDateSuggested)
+                                {
+                                    <div class="form-text text-warning-emphasis">
+                                        Датата не беше открита, затова беше предложена текущата дата и час.
+                                    </div>
+                                }
+                            </div>
 
                         <div class="mb-0">
-                            <label asp-for="TotalEUR" class="form-label">Total in EUR</label>
+                            <label asp-for="TotalEUR" class="form-label">Общо в евро</label>
                             <input asp-for="TotalEUR" class="form-control @(Model.IsTotalEURSuggested ? "suggested-field" : "")" />
                             <span asp-validation-for="TotalEUR" class="text-danger small"></span>
+
                             @if (Model.IsTotalEURSuggested)
                             {
                                 <div class="form-text text-warning-emphasis">
-                                    EUR total was calculated from BGN using the fixed conversion rate.
+                                    Сумата в евро беше изчислена от лева чрез фиксирания обменен курс.
                                 </div>
+                            }
+                        </div>
+
+                            <div class="mb-3">
+                                <label asp-for="TotalBGN" class="form-label">Общо в лева</label>
+                                <input asp-for="TotalBGN" class="form-control @(Model.IsTotalBGNSuggested ? "suggested-field" : "")" />
+                                <span asp-validation-for="TotalBGN" class="text-danger small"></span>
+
+                                @if (Model.IsTotalBGNSuggested)
+                                {
+                                    <div class="form-text text-warning-emphasis">
+                                        Сумата в лева беше изчислена от евро чрез фиксирания обменен курс.
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-8">
+                        <div class="border rounded-3 p-3 p-md-4 h-100">
+                            <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mb-3">
+                                <div>
+                                    <h2 class="h5 fw-semibold mb-1">Закупени продукти</h2>
+                                    <p class="text-muted small mb-0">
+                                        Редактирай таблицата преди запазване на касовата бележка.
+                                        <br> Колоните Ед.цена и Общо са в евро.
+                                    </p>
+                                </div>
+
+                                <button id="addItemBtn" type="button" class="btn btn-outline-primary">
+                                    Добави продукт
+                                </button>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table align-middle mb-0 receipt-items-table" id="itemsTable">
+                                    <colgroup>
+                                        <col class="item-name-col" />
+                                        <col class="item-quantity-col" />
+                                        <col class="item-price-col" />
+                                        <col class="item-price-col" />
+                                        <col class="item-category-col" />
+                                        <col class="item-action-col" />
+                                    </colgroup>
+
+                                    <thead>
+                                        <tr>
+                                            <th>Продукт</th>
+                                            <th>Количество</th>
+                                            <th>Ед. цена</th>
+                                            <th>Общо</th>
+                                            <th>Категория</th>
+                                            <th class="text-end"></th>
+                                        </tr>
+                                    </thead>
+
+                                <tbody id="itemsBody">
+
+                                    @for (int i = 0; i < Model.Items.Count; i++)
+                                    {
+                                        <tr class="receipt-item-row">
+
+                                            <td data-label="Продукт">
+
+                                                <input type="hidden"
+                                                       asp-for="Items[i].ItemId" />
+
+                                                <input type="hidden"
+                                                       asp-for="Items[i].ReceiptId" />
+
+                                                <input asp-for="Items[i].Name"
+                                                       class="form-control item-name" />
+
+                                            </td>
+
+                                            <td data-label="Количество">
+
+                                                <input asp-for="Items[i].Quantity"
+                                                       class="form-control item-quantity" />
+
+                                            </td>
+
+                                            <td data-label="Единична цена">
+
+                                                <input asp-for="Items[i].UnitPrice"
+                                                       class="form-control item-unit-price" />
+
+                                            </td>
+
+                                            <td data-label="Общо">
+                                                @if (Model.Items[i].HasInvalidTotal)
+                                                {
+                                                    var suggestedTotal =
+                                                        (Model.Items[i].Quantity *
+                                                         Model.Items[i].UnitPrice)
+                                                        .ToString("F2");
+                                                    <div class="form-text text-warning-emphasis mt-1">
+                                                        Предложено:
+                                                        <strong>@suggestedTotal</strong>
+                                                    </div>
+                                                }
+
+                                                <input asp-for="Items[i].TotalPrice"
+                                                       class="form-control item-total-price @(Model.Items[i].HasInvalidTotal ? "suggested-field" : "")" />
+
+                                            </td>
+
+                                            <td data-label="Категория">
+
+                                                <select asp-for="Items[i].CategoryId"
+                                                        class="form-select item-category @(Model.Items[i].IsCategorySuggested ? "border-warning bg-warning-subtle" : "")"
+                                                        asp-items="@(new SelectList(ViewBag.Categories, "CategoryId", "Name"))">
+
+                                                    <option value="">
+                                                        Избери категория
+                                                    </option>
+
+                                                </select>
+
+                                                @if (Model.Items[i].IsCategorySuggested)
+                                                {
+                                                    <div class="form-text text-warning-emphasis mt-1">
+
+                                                        Предложено
+
+                                                    </div>
+                                                }
+
+                                            </td>
+
+                                            <td data-label="Действие"
+                                                class="text-end">
+
+                                                <button type="button"
+                                                        class="btn btn-outline-danger btn-sm remove-item-btn"
+                                                        aria-label="Премахни продукт"
+                                                        title="Премахни продукт">
+
+                                                    &times;
+
+                                                </button>
+
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+                                </table>
+                            </div>
+
+                            <div id="emptyItemsMessage" class="alert alert-warning mt-3 mb-0 @(Model.Items.Count > 0 ? "d-none" : "")">
+                                В момента няма добавени продукти. При нужда добави продукти ръчно.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="border rounded-3 p-3 p-md-4">
+                            <h2 class="h5 fw-semibold mb-3">OCR текст</h2>
+
+                            @if (Model.RawTextLines.Count > 0)
+                            {
+                                <div class="bg-light border rounded-3 p-3 small">
+                                    @foreach (var item in Model.RawTextLines)
+                                    {
+                                        <div>@item</div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted mb-0">OCR не успя да извлече текст.</p>
                             }
                         </div>
                     </div>
                 </div>
 
-                <div class="col-12 col-lg-8">
-                    <div class="border rounded-3 p-3 p-md-4 h-100">
-                        <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mb-3">
-                            <div>
-                                <h2 class="h5 fw-semibold mb-1">Purchased items</h2>
-                                <p class="text-muted small mb-0">Edit the table before saving the receipt.</p>
-                            </div>
-
-                            <button id="addItemBtn" type="button" class="btn btn-outline-primary">
-                                Add item
-                            </button>
-                        </div>
-
-                        <div class="table-responsive">
-                            <table class="table align-middle mb-0 receipt-items-table" id="itemsTable">
-                                <colgroup>
-                                    <col class="item-name-col" />
-                                    <col class="item-quantity-col" />
-                                    <col class="item-price-col" />
-                                    <col class="item-price-col" />
-                                    <col class="item-category-col" />
-                                    <col class="item-action-col" />
-                                </colgroup>
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Qty</th>
-                                        <th>Unit price</th>
-                                        <th>Total</th>
-                                        <th>Category</th>
-                                        <th class="text-end"></th>
-                                    </tr>
-                                </thead>
-
-                                <tbody id="itemsBody">
-                                    @for (int i = 0; i < Model.Items.Count; i++)
-                                    {
-                                        <tr class="receipt-item-row">
-                                            <td data-label="Product">
-                                                <input type="hidden" asp-for="Items[i].ItemId" />
-                                                <input type="hidden" asp-for="Items[i].ReceiptId" />
-                                                <input asp-for="Items[i].Name" class="form-control item-name" />
-                                            </td>
-                                            <td data-label="Qty">
-                                                <input asp-for="Items[i].Quantity" class="form-control item-quantity" />
-                                            </td>
-                                            <td data-label="Unit price">
-                                                <input asp-for="Items[i].UnitPrice" class="form-control item-unit-price" />
-                                            </td>
-                                            <td data-label="Total">
-                                                <input asp-for="Items[i].TotalPrice"
-                                                       class="form-control item-total-price @(Model.Items[i].HasInvalidTotal ? "suggested-field" : "")" />
-
-                                                @if (Model.Items[i].HasInvalidTotal)
-                                                {
-                                                    var suggestedTotal = (Model.Items[i].Quantity * Model.Items[i].UnitPrice).ToString("F2");
-
-                                                    <div class="form-text text-warning-emphasis mt-1">
-                                                        Suggested:
-                                                        <strong>@suggestedTotal</strong>
-                                                    </div>
-                                                }
-                                            </td>
-                                            <td data-label="Category">
-                                                <select asp-for="Items[i].CategoryId"
-                                                        class="form-select item-category"
-                                                        asp-items="@(new SelectList(ViewBag.Categories, "CategoryId", "Name"))">
-                                                    <option value="">Select category</option>
-                                                </select>
-                                            </td>
-                                            <td data-label="Action" class="text-end">
-                                                <button type="button" class="btn btn-outline-danger btn-sm remove-item-btn" aria-label="Remove item" title="Remove item">
-                                                    &times;
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div id="emptyItemsMessage" class="alert alert-warning mt-3 mb-0 @(Model.Items.Count > 0 ? "d-none" : "")">
-                            No receipt items are currently listed. Add an item manually if needed.
-                        </div>
-                    </div>
+                <div class="d-grid d-md-flex justify-content-md-end mt-4">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        Потвърди и запази
+                    </button>
                 </div>
+            }
+        </div>
+    </section>
 
-                <div class="col-12">
-                    <div class="border rounded-3 p-3 p-md-4">
-                        <h2 class="h5 fw-semibold mb-3">Raw OCR text</h2>
+    <template id="itemRowTemplate">
+        <tr class="receipt-item-row">
+            <td data-label="Продукт">
+                <input type="hidden" data-field="ItemId" value="" />
+                <input type="hidden" data-field="ReceiptId" value="" />
+                <input data-field="Name" class="form-control item-name" value="" />
+            </td>
 
-                        @if (Model.RawTextLines.Count > 0)
-                        {
-                            <div class="bg-light border rounded-3 p-3 small">
-                                @foreach (var item in Model.RawTextLines)
-                                {
-                                    <div>@item</div>
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            <p class="text-muted mb-0">No raw text lines available.</p>
-                        }
-                    </div>
-                </div>
-            </div>
+            <td data-label="Количество">
+                <input data-field="Quantity" class="form-control item-quantity" value="1" />
+            </td>
 
-            <div class="d-grid d-md-flex justify-content-md-end mt-4">
-                <button type="submit" class="btn btn-success btn-lg">
-                    Confirm and save
+            <td data-label="Ед. цена">
+                <input data-field="UnitPrice" class="form-control item-unit-price" value="0.00" />
+            </td>
+
+            <td data-label="Общо">
+                <input data-field="TotalPrice" class="form-control item-total-price" value="0.00" />
+            </td>
+
+            <td data-label="Категория">
+                <select data-field="CategoryId" class="form-select item-category">
+                    <option value="">Избери категория</option>
+
+                    @foreach (var category in ViewBag.Categories)
+                    {
+                        <option value="@category.CategoryId">@category.Name</option>
+                    }
+                </select>
+            </td>
+
+            <td data-label="Действие" class="text-end">
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm remove-item-btn"
+                        aria-label="Премахни продукт"
+                        title="Премахни продукт">
+                    &times;
                 </button>
-            </div>
-        }
-    </div>
-</section>
+            </td>
+        </tr>
+    </template>
 
-<template id="itemRowTemplate">
-    <tr class="receipt-item-row">
-        <td data-label="Product">
-            <input type="hidden" data-field="ItemId" value="" />
-            <input type="hidden" data-field="ReceiptId" value="" />
-            <input data-field="Name" class="form-control item-name" value="" />
-        </td>
-        <td data-label="Qty">
-            <input data-field="Quantity" class="form-control item-quantity" value="1" />
-        </td>
-        <td data-label="Unit price">
-            <input data-field="UnitPrice" class="form-control item-unit-price" value="0.00" />
-        </td>
-        <td data-label="Total">
-            <input data-field="TotalPrice" class="form-control item-total-price" value="0.00" />
-        </td>
-        <td data-label="Category">
-            <select data-field="CategoryId" class="form-select item-category">
-                <option value="">Select category</option>
-
-                @foreach (var category in ViewBag.Categories)
-                {
-                    <option value="@category.CategoryId">@category.Name</option>
-                }
-            </select>
-        </td>
-        <td data-label="Action" class="text-end">
-            <button type="button"
-                    class="btn btn-outline-danger btn-sm remove-item-btn"
-                    aria-label="Remove item"
-                    title="Remove item">
-                &times;
-            </button>
-        </td>
-    </tr>
-</template>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/receipt-result.js" asp-append-version="true"></script>
-}
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+        <script src="~/js/receipt-result.js" asp-append-version="true"></script>
+    }
