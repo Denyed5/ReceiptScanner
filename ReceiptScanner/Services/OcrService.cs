@@ -30,6 +30,8 @@ namespace ReceiptScanner.Services
 
             text = CleanGarbage(text);
 
+            result.OcrConfidence = confidence; // тест
+            Console.WriteLine($"OCR Confidence: {confidence}"); // тест
             result.RawText = text;
 
             return result;

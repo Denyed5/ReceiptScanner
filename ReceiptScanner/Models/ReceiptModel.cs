@@ -30,6 +30,8 @@ namespace ReceiptScanner.Models
         public string? ImagePath { get; set; }
         public string UserId { get; set; } = string.Empty;
         public ReceiptScannerUser? User { get; set; }
+        [NotMapped]
+        public float OcrConfidence { get; set; }
 
         [NotMapped]
         public bool IsDateSuggested { get; set; }

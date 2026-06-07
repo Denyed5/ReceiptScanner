@@ -2,7 +2,7 @@
 @model RegisterModel
 
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Регистрация";
 }
 
 <section class="py-4 py-lg-5">
@@ -12,7 +12,7 @@
                 <div class="border rounded-3 p-3 p-md-4">
                     <h1 class="h3 fw-bold mb-2">@ViewData["Title"]</h1>
                     <p class="text-muted mb-4">
-                        Create an account to save receipts and track expenses.
+                        Създай профил, за да запазваш бележки и да следиш разходите си.
                     </p>
 
                     <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
@@ -20,29 +20,29 @@
 
                         <div class="form-floating mb-3">
                             <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                            <label asp-for="Input.Email">Email</label>
+                            <label asp-for="Input.Email">Имейл</label>
                             <span asp-validation-for="Input.Email" class="text-danger small"></span>
                         </div>
 
                         <div class="form-floating mb-3">
                             <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                            <label asp-for="Input.Password">Password</label>
+                            <label asp-for="Input.Password">Парола</label>
                             <span asp-validation-for="Input.Password" class="text-danger small"></span>
                         </div>
 
                         <div class="form-floating mb-3">
                             <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                            <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                            <label asp-for="Input.ConfirmPassword">Потвърди парола</label>
                             <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
                         </div>
 
                         <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">
-                            Create account
+                            Създай профил
                         </button>
 
                         <div class="mt-4 small">
                             <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">
-                                Already have an account? Log in
+                                Вече имаш профил? Вход
                             </a>
                         </div>
                     </form>
@@ -51,7 +51,7 @@
                 @if ((Model.ExternalLogins?.Count ?? 0) > 0)
                 {
                     <div class="border rounded-3 p-3 p-md-4 mt-3">
-                        <h2 class="h5 fw-semibold mb-3">Use another service</h2>
+                        <h2 class="h5 fw-semibold mb-3">Използвай друга опция</h2>
 
                         <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
                             <div class="d-grid gap-2">
