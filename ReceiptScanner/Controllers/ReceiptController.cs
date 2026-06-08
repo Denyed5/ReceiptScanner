@@ -170,9 +170,8 @@ namespace ReceiptScanner.Controllers
             }
 
             var fullPath = GetStoredImageFullPath(receipt.ImagePath);
-            var allowedRoot = Path.GetFullPath(Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages"));
 
-            if (!fullPath.StartsWith(allowedRoot, StringComparison.OrdinalIgnoreCase))
+            if (!IsPathInsideReceiptStorage(fullPath))
             {
                 return NotFound();
             }
@@ -293,9 +292,8 @@ namespace ReceiptScanner.Controllers
             if (!string.IsNullOrWhiteSpace(receipt.ImagePath))
             {
                 var imageFullPath = GetStoredImageFullPath(receipt.ImagePath);
-                var allowedRoot = Path.GetFullPath(Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages"));
 
-                if (imageFullPath.StartsWith(allowedRoot, StringComparison.OrdinalIgnoreCase)
+                if (IsPathInsideReceiptStorage(imageFullPath)
                     && System.IO.File.Exists(imageFullPath))
                 {
                     System.IO.File.Delete(imageFullPath);
@@ -368,7 +366,7 @@ namespace ReceiptScanner.Controllers
                 finalBytes = image.ToBytes(".png");
             }
 
-            var tempImageDirectory = Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages", "Temp");
+            var tempImageDirectory = Path.Combine(GetReceiptStorageRoot(), "Temp");
             Directory.CreateDirectory(tempImageDirectory);
 
             var tempImageFileName = $"{Guid.NewGuid():N}.png";
@@ -376,7 +374,7 @@ namespace ReceiptScanner.Controllers
 
             await System.IO.File.WriteAllBytesAsync(tempImageFullPath, finalBytes);
 
-            var tempImagePath = Path.Combine("App_Data", "ReceiptImages", "Temp", tempImageFileName);
+            var tempImagePath = Path.Combine("Temp", tempImageFileName);
 
             var result = await _ocr.ReadText(finalBytes, model.Language);
 
@@ -523,17 +521,34 @@ namespace ReceiptScanner.Controllers
 
         private string GetReceiptImagesDirectory(string userId)
         {
-            return Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages", GetSafePathSegment(userId));
+            return Path.Combine(GetReceiptStorageRoot(), GetSafePathSegment(userId));
         }
-
         private string GetReceiptImageRelativePath(string userId, string fileName)
         {
-            return Path.Combine("App_Data", "ReceiptImages", GetSafePathSegment(userId), fileName);
+            return Path.Combine(GetSafePathSegment(userId), fileName);
         }
 
         private string GetStoredImageFullPath(string imagePath)
         {
-            return Path.GetFullPath(Path.Combine(_env.ContentRootPath, imagePath));
+            return Path.GetFullPath(Path.Combine(GetReceiptStorageRoot(), imagePath));
+        }
+
+        private bool IsPathInsideReceiptStorage(string path)
+        {
+            return IsPathInsideRoot(path, GetReceiptStorageRoot());
+        }
+
+        private static bool IsPathInsideRoot(string path, string root)
+        {
+            var fullPath = Path.GetFullPath(path);
+            var fullRoot = Path.GetFullPath(root);
+
+            if (!fullRoot.EndsWith(Path.DirectorySeparatorChar))
+            {
+                fullRoot += Path.DirectorySeparatorChar;
+            }
+
+            return fullPath.StartsWith(fullRoot, StringComparison.OrdinalIgnoreCase);
         }
 
         private string? MoveTempReceiptImageToUserStorage(string? tempImagePath, string userId, string receiptId)
@@ -544,9 +559,9 @@ namespace ReceiptScanner.Controllers
             }
 
             var tempFullPath = GetStoredImageFullPath(tempImagePath);
-            var tempRoot = Path.GetFullPath(Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages", "Temp"));
+            var tempRoot = Path.GetFullPath(Path.Combine(GetReceiptStorageRoot(), "Temp"));
 
-            if (!tempFullPath.StartsWith(tempRoot, StringComparison.OrdinalIgnoreCase)
+            if (!IsPathInsideRoot(tempFullPath, tempRoot)
                 || !System.IO.File.Exists(tempFullPath))
             {
                 return null;
@@ -571,6 +586,17 @@ namespace ReceiptScanner.Controllers
             }
 
             return value;
+        }
+        private string GetReceiptStorageRoot()
+        {
+            var home = Environment.GetEnvironmentVariable("HOME");
+
+            if (!string.IsNullOrWhiteSpace(home))
+            {
+                return Path.Combine(home, "data", "ReceiptImages");
+            }
+
+            return Path.Combine(_env.ContentRootPath, "App_Data", "ReceiptImages");
         }
     }
 }
