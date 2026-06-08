@@ -366,19 +366,9 @@ namespace ReceiptScanner.Controllers
                 finalBytes = image.ToBytes(".png");
             }
 
-            var tempImageDirectory = Path.Combine(GetReceiptStorageRoot(), "Temp");
-            Directory.CreateDirectory(tempImageDirectory);
-
-            var tempImageFileName = $"{Guid.NewGuid():N}.png";
-            var tempImageFullPath = Path.Combine(tempImageDirectory, tempImageFileName);
-
-            await System.IO.File.WriteAllBytesAsync(tempImageFullPath, finalBytes);
-
-            var tempImagePath = Path.Combine("Temp", tempImageFileName);
-
             var result = await _ocr.ReadText(finalBytes, model.Language);
 
-            result.ImagePath = tempImagePath;
+            result.ImagePath = null;
 
             var lines = _parser.GetCleanLines(result.RawText);
             string? vendorLine = _parser.ExtractVendorLine(lines, 5);
