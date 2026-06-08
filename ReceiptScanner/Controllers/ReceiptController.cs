@@ -338,32 +338,28 @@ namespace ReceiptScanner.Controllers
                 imageBytes = ms.ToArray();
             }
 
-            Mat decodedImage;
-            try
-            {
-                decodedImage = Cv2.ImDecode(imageBytes, ImreadModes.Color);
-            }
-            catch (OpenCVException)
-            {
-                return UploadViewWithError(model, "The selected file could not be loaded as an image. Please choose a different receipt image.");
-            }
-
-            using Mat image = decodedImage;
-            if (image.Empty())
-            {
-                return UploadViewWithError(model, "The selected file could not be loaded as an image. Please choose a different receipt image.");
-            }
-
-            byte[] finalBytes;
+            byte[] finalBytes = imageBytes;
 
             if (model.UsePreprocessing)
             {
+                Mat decodedImage;
+                try
+                {
+                    decodedImage = Cv2.ImDecode(imageBytes, ImreadModes.Color);
+                }
+                catch (OpenCVException)
+                {
+                    return UploadViewWithError(model, "The selected file could not be loaded as an image. Please choose a different receipt image.");
+                }
+
+                using Mat image = decodedImage;
+                if (image.Empty())
+                {
+                    return UploadViewWithError(model, "The selected file could not be loaded as an image. Please choose a different receipt image.");
+                }
+
                 using var processed = _preprocessing.Preprocess(image);
                 finalBytes = processed.ToBytes(".png");
-            }
-            else
-            {
-                finalBytes = image.ToBytes(".png");
             }
 
             var result = await _ocr.ReadText(finalBytes, model.Language);
