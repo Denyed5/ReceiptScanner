@@ -47,7 +47,7 @@ namespace ReceiptScanner.Controllers
                 .GroupBy(r => r.Date!.Value.ToString("MMM yyyy"))
                 .ToDictionary(g => g.Key, g => g.Sum(r => r.TotalBGN ?? 0));
 
-            var model = new DashboardViewModel
+            var model = new DashboardModel
             {
                 ReceiptCount = receipts.Count,
 
@@ -110,7 +110,7 @@ namespace ReceiptScanner.Controllers
                     g => g.Sum(r => r.TotalBGN ?? 0)
                 );
 
-            var model = new DashboardViewModel
+            var model = new DashboardModel
             {
                 CategoryTotals = categoryTotals,
                 MonthlyTotals = monthlyTotals

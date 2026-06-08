@@ -1,4 +1,4 @@
-﻿@model ReceiptScanner.Models.DashboardViewModel
+﻿@model ReceiptScanner.Models.DashboardModel
 
 @{
     ViewData["Title"] = "Анализи";
@@ -99,7 +99,7 @@
                                             <td>@category.Key</td>
 
                                             <td class="text-end">
-                                                @category.Value.ToString("0.00") лв.
+                                                @category.Value.ToString("0.00") евро
                                             </td>
                                         </tr>
                                     }

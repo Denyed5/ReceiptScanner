@@ -11,18 +11,18 @@ namespace ReceiptScanner.Models
         [Key]
         public string ReceiptId { get; set; } = Guid.NewGuid().ToString();
 
-        [Required(ErrorMessage = "Vendor is required.")]
+        [Required(ErrorMessage = "Въведи име на търговец.")]
         public string? VendorName { get; set; }
 
-        [Required(ErrorMessage = "Total in BGN is required.")]
-        [Range(0.01, 999999.99, ErrorMessage = "Total in BGN must be greater than 0.")]
+        [Required(ErrorMessage = "Въведи обща сума в лева.")]
+        [Range(0.01, 999999.99, ErrorMessage = "Общата сума в лева трябва да е по-голяма от 0.")]
         public decimal? TotalBGN { get; set; }
 
-        [Required(ErrorMessage = "Total in EUR is required.")]
-        [Range(0.01, 999999.99, ErrorMessage = "Total in EUR must be greater than 0.")]
+        [Required(ErrorMessage = "Въведи обща сума в евро.")]
+        [Range(0.01, 999999.99, ErrorMessage = "Общата сума в евро трябва да е по-голяма от 0.")]
         public decimal? TotalEUR { get; set; }
 
-        [Required(ErrorMessage = "Date is required.")]
+        [Required(ErrorMessage = "Въведи дата.")]
         public DateTime? Date { get; set; }
         public string RawText { get; set; } = "";
         public List<RItemModel> Items { get; set; } = new();

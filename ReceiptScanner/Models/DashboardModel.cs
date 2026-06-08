@@ -2,7 +2,7 @@
 
 namespace ReceiptScanner.Models
 {
-    public class DashboardViewModel
+    public class DashboardModel
     {
         public int ReceiptCount { get; set; }
         public decimal TotalSpentBGN { get; set; }

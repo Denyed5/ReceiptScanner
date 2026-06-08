@@ -22,8 +22,8 @@ namespace ReceiptScanner.Services
             engine.DefaultPageSegMode = PageSegMode.SingleColumn;
             engine.SetVariable("user_defined_dpi", "300");
 
-            using var pix = Pix.LoadFromMemory(imageBytes);
-            using var page = engine.Process(pix);
+            using var pixels = Pix.LoadFromMemory(imageBytes);
+            using var page = engine.Process(pixels);
 
             var text = page.GetText();
             var confidence = page.GetMeanConfidence();

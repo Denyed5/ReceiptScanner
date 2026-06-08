@@ -68,20 +68,6 @@ namespace ReceiptScanner.Services
             "ДЕБИТНА"
         };
 
-        private static readonly string[] TotalBgnIgnoreKeywords =
-        {
-            "МЕЖДИННА",
-            "ЕВРО",
-            "EUR",
-            "EURO",
-            "ОТСТЪПКА",
-            "ОТСТЪПКИ",
-            "КУПОН",
-            "ВАУЧЕР",
-            "РЕСТО",
-            "ДДС"
-        };
-
         private static readonly string[] InvalidProductKeywords =
         {
             "ОБЩО",
@@ -141,23 +127,25 @@ namespace ReceiptScanner.Services
         {
             return text
 
-                // New lines
+                // Нов ред
                 .Replace("\r\n", "\n")
                 .Replace('\r', '\n')
 
-                // Multiplication symbols
+                // Символи за умножение
                 .Replace("×", "x")
                 .Replace("х", "x")
                 .Replace("Х", "x")
                 .Replace("*", "x")
 
-                // Bulgarian currency mistakes
+                // Грешки при изписване на лева "лв"
                 .Replace("ЛB", "ЛВ")
                 .Replace("лB", "лв")
                 .Replace("LB", "ЛВ")
                 .Replace("IB", "ЛВ")
+                .Replace("BG ", "BG")
+                .Replace("B G", "BG")
 
-                // Commom punctuation mistakes
+                // Грешки при разделители
                 .Replace("‚", ",")
                 .Replace("‘", "'")
                 .Replace("’", "'")
@@ -165,13 +153,13 @@ namespace ReceiptScanner.Services
                 .Replace("“", "\"")
                 .Replace("”", "\"")
 
-                // Spacing artifacts
+                // Ненужни интервали
                 .Replace("  ", " ")
                 .Replace("   ", " ")
 
                 .Replace("|", "1")
 
-                // Common Latin/Cyrillic mixups
+                // Често срещани грешки между латиница и кирилица
                 .Replace("K", "К")
                 .Replace("M", "М")
                 .Replace("H", "Н")
@@ -180,24 +168,17 @@ namespace ReceiptScanner.Services
                 .Replace("X", "Х")
                 .Replace("!", "l") //           !!!
 
-                // Normalize tabs
                 .Replace("\t", " ")
-
                 .Replace("..", ".")
                 .Replace(",.", ".")
                 .Replace(".,", ".")
                 .Replace("»", "")
                 .Replace(">", "")
                 .Replace("«", "")
-
-                // Normalize decimal separator spacing
                 .Replace(" ,", ",")
                 .Replace(", ", ",")
                 .Replace(" .", ".")
-                .Replace(". ", ".")
-
-                .Replace("BG ", "BG")
-                .Replace("B G", "BG");
+                .Replace(". ", ".");
         }
 
         public List<string> GetCleanLines(string text)
@@ -373,7 +354,7 @@ namespace ReceiptScanner.Services
         {
             var name = PriceRegex.Replace(line, " ");
             name = Regex.Replace(name, @"\b\d+(?:[.,]\d+)?\s*x\s*\d+[.,]\d{1,2}\b", " ", RegexOptions.IgnoreCase);
-            name = RemoveTaxGroupSuffix(name);
+            name = RemoveSuffix(name);
             name = Regex.Replace(name, @"(?<=\d)\s*96\b", "%");
             name = Regex.Replace(name, @"\s+", " ").Trim(' ', '-', ':', ';', '.', ',');
 
@@ -411,7 +392,7 @@ namespace ReceiptScanner.Services
             return true;
         }
 
-        private static string RemoveTaxGroupSuffix(string name)
+        private static string RemoveSuffix(string name)
         {
             return Regex.Replace(name, @"\s+[АБВГДABVCС6]$", "", RegexOptions.IgnoreCase);
         }
