@@ -35,10 +35,5 @@
   <ItemGroup>
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
-  
-  <PropertyGroup>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-  </PropertyGroup>
 
 </Project>

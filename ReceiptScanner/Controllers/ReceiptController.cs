@@ -307,14 +307,6 @@ namespace ReceiptScanner.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Upload(ReceiptUploadModel model, string? croppedImage)
         {
-            try
-            {
-                var version = Cv2.GetVersionString();
-            }
-            catch (Exception ex)
-            {
-                return Content(ex.ToString());
-            }
             byte[] imageBytes;
 
             if (!string.IsNullOrEmpty(croppedImage)) 
