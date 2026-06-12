@@ -41,5 +41,20 @@ namespace ReceiptScanner.Models
 
         [NotMapped]
         public bool IsTotalEURSuggested { get; set; }
+
+        [NotMapped]
+        public decimal ItemsTotalEUR =>
+        Math.Round(Items.Sum(i => i.TotalPrice), 2);
+
+        [NotMapped]
+        public decimal? TotalEURDifference => TotalEUR.HasValue
+                ? Math.Round(TotalEUR.Value - ItemsTotalEUR, 2)
+                : null;
+
+        [NotMapped]
+        public bool HasTotalEURMismatch =>
+            TotalEUR.HasValue
+            && Items.Count > 0
+            && Math.Abs(TotalEURDifference!.Value) > 0.01m;
     }
 }

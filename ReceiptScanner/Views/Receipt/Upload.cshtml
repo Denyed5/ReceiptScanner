@@ -1,7 +1,7 @@
 ﻿@model ReceiptUploadModel
 
 @{
-    ViewData["Title"] = "Качване на касова бележка";
+    ViewData["Title"] = "Добавяне на касова бележка";
 }
 
 <section class="py-4 py-lg-5">
@@ -10,9 +10,9 @@
             <div class="col-12 col-xl-10">
                 <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
                     <div>
-                        <h1 class="h2 fw-bold mb-2">Качване на касова бележка</h1>
+                        <h1 class="h2 fw-bold mb-2">Добавяне на касова бележка</h1>
                         <p class="text-muted mb-0">
-                            Направи снимка на касова бележка или качи съществуващо изображение, след което я сканирай чрез OCR.
+                            Направи снимка на касова бележка или добави съществуващо изображение, след което я сканирай чрез OCR.
                         </p>
                     </div>
                 </div>
@@ -115,11 +115,11 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title fs-5" id="uploadErrorModalLabel">Грешка при качване на изображение</h2>
+                <h2 class="modal-title fs-5" id="uploadErrorModalLabel">Грешка при добавяне на изображение</h2>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Затвори"></button>
             </div>
             <div class="modal-body" id="uploadErrorMessage">
-                Неподдържан формат на изображението. Моля, качи JPG, PNG или BMP изображение на касова бележка.
+                Неподдържан формат на изображението. Моля, избери JPG, PNG или BMP изображение на касова бележка.
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal">

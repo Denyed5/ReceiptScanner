@@ -217,6 +217,65 @@
     </tr>
 </template>
 
+<div class="modal fade" id="totalMismatchModal" tabindex="-1" aria-labelledby="totalMismatchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="totalMismatchModalLabel">
+                    Несъответствие в сумите
+                </h2>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Затвори">
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p>
+                    Общата сума в евро не съвпада със сумата на продуктите.
+                </p>
+
+                <div class="vstack gap-2">
+                    <div>
+                        Общо в евро:
+                        <strong id="receiptTotalEurText">0.00</strong>
+                    </div>
+
+                    <div>
+                        Сума на продуктите:
+                        <strong id="itemsTotalEurText">0.00</strong>
+                    </div>
+
+                    <div>
+                        Разлика:
+                        <strong id="totalDifferenceEurText">0.00</strong>
+                    </div>
+                </div>
+
+                <p class="mb-0 mt-3 text-muted">
+                    Искаш ли да запазиш касовата бележка въпреки разликата?
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    Отказ
+                </button>
+
+                <button type="button"
+                        class="btn btn-warning"
+                        id="confirmMismatchSaveBtn">
+                    Запази въпреки това
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/receipt-result.js" asp-append-version="true"></script>
