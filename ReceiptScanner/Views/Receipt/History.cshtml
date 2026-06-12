@@ -34,30 +34,31 @@
 
         @if (Model.Count == 0)
         {
-            <div class="border rounded-4 p-4 shadow-sm h-100 bg-white text-center">
+            <div class="border rounded-4 p-4 shadow-sm h-100 bg-white">
+
                 <div class="d-flex flex-wrap gap-2 mb-3">
 
                     <a asp-action="History"
                        asp-route-period="week"
-                       class="btn btn-outline-primary">
+                       class="btn btn-primary">
                         Тази седмица
                     </a>
 
                     <a asp-action="History"
                        asp-route-period="month"
-                       class="btn btn-outline-primary">
+                       class="btn btn-primary">
                         Този месец
                     </a>
 
                     <a asp-action="History"
                        asp-route-period="30days"
-                       class="btn btn-outline-primary">
+                       class="btn btn-primary">
                         Последни 30 дни
                     </a>
 
                     <a asp-action="History"
                        asp-route-period="year"
-                       class="btn btn-outline-primary">
+                       class="btn btn-primary">
                         Тази година
                     </a>
 
@@ -68,7 +69,49 @@
                         Персонализиран период
                     </button>
 
+                    <a asp-action="History"
+                       class="btn btn-outline-secondary custom-btn">
+                        Изчисти
+                    </a>
+
                 </div>
+
+                <div class="collapse" id="filtersPanel">
+
+                    <form method="get" asp-action="History">
+
+                        <div class="row g-3 align-items-end">
+
+                            <div class="col-md-4">
+                                <label class="form-label">Начална дата</label>
+                                <input type="date"
+                                       name="startDate"
+                                       value="@ViewBag.StartDate"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Крайна дата</label>
+                                <input type="date"
+                                       name="endDate"
+                                       value="@ViewBag.EndDate"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="d-flex gap-2">
+
+                                    <button type="submit"
+                                            class="btn btn-primary">
+                                        Филтрирай
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <br>
+                <div class="text-center">
                 <h2 class="h4 fw-semibold mb-2">Няма запазени касови бележки</h2>
                 <p class="text-muted mb-4">
                     Тук ще се появят запазените касови бележки, след като ги сканираш и потвърдиш.
@@ -77,6 +120,7 @@
                 <a asp-controller="Receipt" asp-action="Upload" class="btn btn-primary btn-lg">
                     Сканирай първата си касова бележка
                 </a>
+                </div>
             </div>
         }
         else
