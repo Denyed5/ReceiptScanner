@@ -17,26 +17,58 @@
     }
 }
 
-<section class="py-4 py-lg-5">
+<section class="py-4 py-lg-4">
     <div class="container">
-        <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+        <div class="history-header mb-3">
             <div>
-                <h1 class="h2 fw-bold mb-2">История на касовите бележки</h1>
-                <p class="text-muted mb-0">
+                <h1 class="mb-2">История на касовите бележки</h1>
+                <p class="mb-0">
                     Преглеждай запазените си касови бележки и отвори всяка бележка, за да видиш продуктите в нея.
                 </p>
             </div>
 
-            <div class="d-grid d-md-block">
                 <a asp-controller="Receipt" asp-action="Upload" class="btn btn-primary btn-lg">
                     Сканирай касова бележка
                 </a>
-            </div>
         </div>
 
         @if (Model.Count == 0)
         {
-            <div class="border rounded-3 p-4 p-md-5 text-center">
+            <div class="border rounded-4 p-4 shadow-sm h-100 bg-white text-center">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+
+                    <a asp-action="History"
+                       asp-route-period="week"
+                       class="btn btn-outline-primary">
+                        Тази седмица
+                    </a>
+
+                    <a asp-action="History"
+                       asp-route-period="month"
+                       class="btn btn-outline-primary">
+                        Този месец
+                    </a>
+
+                    <a asp-action="History"
+                       asp-route-period="30days"
+                       class="btn btn-outline-primary">
+                        Последни 30 дни
+                    </a>
+
+                    <a asp-action="History"
+                       asp-route-period="year"
+                       class="btn btn-outline-primary">
+                        Тази година
+                    </a>
+
+                    <button class="btn btn-primary"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#filtersPanel">
+                        Персонализиран период
+                    </button>
+
+                </div>
                 <h2 class="h4 fw-semibold mb-2">Няма запазени касови бележки</h2>
                 <p class="text-muted mb-4">
                     Тук ще се появят запазените касови бележки, след като ги сканираш и потвърдиш.
@@ -49,7 +81,89 @@
         }
         else
         {
-            <div class="border rounded-3 p-3 p-md-4">
+            <div class="border rounded-4 p-4 shadow-sm h-100 bg-white">
+
+                <div class="d-flex flex-wrap gap-2 mb-3">
+
+                    <a asp-action="History"
+                       asp-route-period="week"
+                       class="btn btn-primary">
+                        Тази седмица
+                    </a>
+
+                    <a asp-action="History"
+                       asp-route-period="month"
+                       class="btn btn-primary">
+                        Този месец
+                    </a>
+
+                    <a asp-action="History"
+                       asp-route-period="30days"
+                       class="btn btn-primary">
+                        Последни 30 дни
+                    </a>
+
+                    <a asp-action="History"
+                       asp-route-period="year"
+                       class="btn btn-primary">
+                        Тази година
+                    </a>
+
+                    <button class="btn btn-primary"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#filtersPanel">
+                        Персонализиран период
+                    </button>
+
+                    <a asp-action="History"
+                       class="btn btn-outline-secondary custom-btn">
+                        Изчисти
+                    </a>
+
+                </div>
+
+                <div class="collapse" id="filtersPanel">
+
+                    <form method="get" asp-action="History">
+
+                        <div class="row g-3 align-items-end">
+
+                            <div class="col-md-4">
+                                <label class="form-label">Начална дата</label>
+                                <input type="date"
+                                       name="startDate"
+                                       value="@ViewBag.StartDate"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Крайна дата</label>
+                                <input type="date"
+                                       name="endDate"
+                                       value="@ViewBag.EndDate"
+                                       class="form-control" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="d-flex gap-2">
+
+                                    <button type="submit"
+                                            class="btn btn-primary">
+                                        Филтрирай
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <br>
+
+                <div class="alert border text-center mb-4">
+                    <strong>Избран период:</strong>
+                    @ViewBag.PeriodTextHistory
+                </div>
+
                 <div class="table-responsive">
                     <table class="table align-middle mb-0">
                         <thead>
@@ -63,8 +177,20 @@
                                        asp-action="History"
                                        asp-route-sortBy="date"
                                        asp-route-sortDirection="@NextDirection("date")"
+                                       asp-route-startDate="@ViewBag.StartDate"
+                                       asp-route-endDate="@ViewBag.EndDate"
                                        class="link-dark text-decoration-none">
                                         Дата
+                                        @if (sortBy == "date")
+                                        {
+                                            <i class="bi @(sortDirection == "asc"
+                                                               ? "bi-sort-up"
+                                                               : "bi-sort-down")"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-arrow-down-up"></i>
+                                        }
                                     </a>
                                 </th>
 
@@ -73,12 +199,46 @@
                                        asp-action="History"
                                        asp-route-sortBy="total"
                                        asp-route-sortDirection="@NextDirection("total")"
+                                       asp-route-startDate="@ViewBag.StartDate"
+                                       asp-route-endDate="@ViewBag.EndDate"
                                        class="link-dark text-decoration-none">
                                         Общо в лева
+
+                                        @if (sortBy == "total")
+                                        {
+                                            <i class="bi @(sortDirection == "asc"
+                                                               ? "bi-sort-up"
+                                                               : "bi-sort-down")"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-arrow-down-up"></i>
+                                        }
                                     </a>
                                 </th>
 
-                                <th class="text-end">Общо в евро</th>
+                                <th class="text-end">
+                                    <a asp-controller="Receipt"
+                                       asp-action="History"
+                                       asp-route-sortBy="total"
+                                       asp-route-sortDirection="@NextDirection("total")"
+                                       asp-route-startDate="@ViewBag.StartDate"
+                                       asp-route-endDate="@ViewBag.EndDate"
+                                       class="link-dark text-decoration-none">
+                                        Общо в евро
+
+                                        @if (sortBy == "total")
+                                        {
+                                            <i class="bi @(sortDirection == "asc"
+                                                               ? "bi-sort-up"
+                                                               : "bi-sort-down")"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-arrow-down-up"></i>
+                                        }
+                                    </a>
+                                </th>
 
                                 <th class="text-end">Действие</th>
                             </tr>
@@ -101,7 +261,7 @@
                                     </td>
 
                                     <td class="text-end">
-                                        @((receipt.TotalEUR ?? 0).ToString("0.00")) евро
+                                        @((receipt.TotalEUR ?? 0).ToString("0.00")) €
                                     </td>
 
                                     <td class="text-end">

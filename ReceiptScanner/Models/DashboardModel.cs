@@ -13,5 +13,9 @@ namespace ReceiptScanner.Models
         public List<ReceiptModel> RecentReceipts { get; set; } = new();
         public Dictionary<string, decimal> CategoryTotals { get; set; } = new();
         public Dictionary<string, decimal> MonthlyTotals { get; set; } = new();
+        public decimal TotalSpentEURPeriod { get; set; }
+        public decimal AverageReceiptEURPeriod { get; set; }
+        public decimal TotalSpentBGNPeriod { get; set; }
+        public decimal AverageReceiptBGNPeriod { get; set; }
     }
 }

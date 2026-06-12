@@ -4,27 +4,155 @@
     ViewData["Title"] = "Анализи";
 }
 
-<section class="py-4 py-lg-5">
+<section class="py-4 py-lg-4">
     <div class="container">
 
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+        <div class="analytics-header mb-3">
             <div>
-                <h1 class="display-6 fw-bold mb-2">
+                <h1 class="mb-2">
                     Анализ на разходите
                 </h1>
 
-                <p class="text-muted mb-0">
+                <p class="mb-0">
                     Графично представяне на потребителските разходи и тяхното разпределение.
                 </p>
             </div>
 
             <a asp-controller="Dashboard"
                asp-action="Dashboard"
-               class="btn btn-outline-secondary">
+               class="btn btn-primary btn-lg">
                 Назад към таблото
             </a>
         </div>
 
+        <div class="border rounded-4 p-4 shadow-sm h-100 bg-white">
+
+            <div class="d-flex flex-wrap gap-2 mb-3">
+
+                <a asp-action="Analytics"
+                   asp-route-period="week"
+                   class="btn btn-primary">
+                    Тази седмица
+                </a>
+
+                <a asp-action="Analytics"
+                   asp-route-period="month"
+                   class="btn btn-primary">
+                    Този месец
+                </a>
+
+                <a asp-action="Analytics"
+                   asp-route-period="30days"
+                   class="btn btn-primary">
+                    Последни 30 дни
+                </a>
+
+                <a asp-action="Analytics"
+                   asp-route-period="year"
+                   class="btn btn-primary">
+                    Тази година
+                </a>
+
+                <button class="btn btn-primary"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#filtersPanel">
+                    Персонализиран период
+                </button>
+
+                <a asp-action="Analytics"
+                   class="btn btn-outline-secondary custom-btn">
+                    Изчисти
+                </a>
+
+            </div>
+
+            <div class="collapse" id="filtersPanel">
+
+                <form method="get" asp-action="Analytics">
+
+                    <div class="row g-3 align-items-end">
+
+                        <div class="col-md-4">
+                            <label class="form-label">Начална дата</label>
+                            <input type="date"
+                                   name="startDate"
+                                   value="@ViewBag.StartDate"
+                                   class="form-control" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Крайна дата</label>
+                            <input type="date"
+                                   name="endDate"
+                                   value="@ViewBag.EndDate"
+                                   class="form-control" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="d-flex gap-2">
+
+                                <button type="submit"
+                                        class="btn btn-primary">
+                                    Филтрирай
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <br>
+
+            <div class="alert border text-center mb-4">
+                <strong>Период на анализа:</strong>
+                @ViewBag.PeriodText
+            </div>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-12 col-md-4">
+                    <div class="dashboard-stat-card">
+                        <div class="small mb-2">
+                            Касови бележки за периода
+                        </div>
+
+                        <div class="stat-value">
+                            @Model.ReceiptCount
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <div class="dashboard-stat-card">
+                        <div class="small mb-2">
+                            Общо разходи за периода
+                        </div>
+
+                        <div class="stat-value">
+                            @Model.TotalSpentEURPeriod.ToString("0.00") €
+                        </div>
+                        <div class="stat-secondary">
+                            @Model.TotalSpentBGNPeriod.ToString("0.00") лв.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <div class="dashboard-stat-card">
+                        <div class="small mb-2">
+                            Среден разход на бележка
+                        </div>
+
+                        <div class="stat-value">
+                            @Model.AverageReceiptEURPeriod.ToString("0.00") €
+                        </div>
+                        <div class="stat-secondary">
+                        @Model.AverageReceiptBGNPeriod.ToString("0.00") лв.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         <div class="row g-4">
 
             <!-- Разходи по категории -->
@@ -99,7 +227,7 @@
                                             <td>@category.Key</td>
 
                                             <td class="text-end">
-                                                @category.Value.ToString("0.00") евро
+                                                @category.Value.ToString("0.00") €
                                             </td>
                                         </tr>
                                     }

@@ -56,7 +56,8 @@ namespace ReceiptScanner.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> History(string sortBy = "date", string sortDirection = "desc")
+        public async Task<IActionResult> History(string sortBy = "date", string sortDirection = "desc", DateTime? startDate = null, 
+                                                 DateTime? endDate = null, string? period = null)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -68,6 +69,55 @@ namespace ReceiptScanner.Controllers
             var receiptsQuery = _context.Receipts
                 .Where(r => r.UserId == userId);
 
+            var today = DateTime.Today;
+
+            switch (period)
+            {
+                case "week":
+                    startDate = today.AddDays(-(int)today.DayOfWeek + 1);
+                    endDate = today;
+                    break;
+
+                case "month":
+                    startDate = new DateTime(today.Year, today.Month, 1);
+                    endDate = today;
+                    break;
+
+                case "30days":
+                    startDate = today.AddDays(-30);
+                    endDate = today;
+                    break;
+
+                case "year":
+                    startDate = new DateTime(today.Year, 1, 1);
+                    endDate = today;
+                    break;
+            }
+
+            if (startDate.HasValue)
+            {
+                receiptsQuery = receiptsQuery
+                    .Where(r => r.Date.HasValue &&
+                                r.Date.Value.Date >= startDate.Value.Date);
+            }
+
+            if (endDate.HasValue)
+            {
+                receiptsQuery = receiptsQuery
+                    .Where(r => r.Date.HasValue &&
+                                r.Date.Value.Date <= endDate.Value.Date);
+            }
+
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                ViewBag.PeriodTextHistory =
+                    $"{startDate.Value:dd.MM.yyyy} - {endDate.Value:dd.MM.yyyy}";
+            }
+            else
+            {
+                ViewBag.PeriodTextHistory = "Всички налични данни";
+            }
+
             receiptsQuery = (sortBy.ToLowerInvariant(), sortDirection.ToLowerInvariant()) switch
             {
                 ("date", "asc") => receiptsQuery.OrderBy(r => r.Date),
@@ -78,6 +128,8 @@ namespace ReceiptScanner.Controllers
 
             ViewBag.SortBy = sortBy;
             ViewBag.SortDirection = sortDirection;
+            ViewBag.StartDate = startDate?.ToString("yyyy-MM-dd");
+            ViewBag.EndDate = endDate?.ToString("yyyy-MM-dd");
 
             var receipts = await receiptsQuery.ToListAsync();
 
