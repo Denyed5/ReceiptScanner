@@ -1,182 +1,124 @@
-﻿@{
-    ViewData["Title"] = "Home";
+@{
+    ViewData["Title"] = "Начало";
 }
 
-<section class="py-5">
-    <div class="container">
-        <div class="row align-items-center g-4">
-            <div class="col-12 col-lg-6">
-                <h1 class="display-5 fw-bold mb-3">
-                    Сканирай касови бележки. <br> Следи разходите си.
+<section class="landing-hero landing-hero-compact" style="background-image: url('@Url.Content("~/images/landing-hero-receipt-scanner.png")');">
+    <div class="landing-hero-overlay">
+        <div class="container">
+            <div class="landing-hero-content">
+
+                <h1 class="landing-title">
+                    От снимка на касова бележка, до категоризиран разход.
                 </h1>
 
-                <p class="lead text-muted mb-4">
-                    Добави снимки на касови бележки, извлечи данни за покупките чрез OCR, запази разходите си и преглеждай обобщения на харчовете си на едно място.
+                <p class="landing-subtitle">
+                    Добави касова бележка, провери извлечените продукти и запази разходите си по категории, в евро и лева.
                 </p>
 
-                <div class="d-grid d-sm-flex gap-2">
-                    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary btn-lg">
-                        Регистрирай се
-                    </a>
-
-                    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-primary btn-lg">
-                        Вход
-                    </a>
-
-                    <a asp-controller="Receipt" asp-action="Upload" class="btn btn-outline-secondary btn-lg">
+                <div class="landing-actions">
+                    <a asp-controller="Receipt" asp-action="Upload" class="btn btn-success btn-lg">
                         Изпробвай
                     </a>
-                </div>
-            </div>
 
-            <div class="col-12 col-lg-6">
-                <div class="border rounded-3 p-3 bg-light">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <strong>Примерна касова бележка</strong>
-                        <span class="badge bg-success">OCR ready</span>
-                    </div>
-
-                    <div class="bg-white border rounded-3 p-3">
-                        <div class="mb-2 fw-semibold">Търговец</div>
-
-                        <div class="d-flex justify-content-between border-bottom py-2">
-                            <span>Мляко</span>
-                            <span>2.40 евро</span>
-                        </div>
-
-                        <div class="d-flex justify-content-between border-bottom py-2">
-                            <span>Хляб</span>
-                            <span>1.80 евро</span>
-                        </div>
-
-                        <div class="d-flex justify-content-between border-bottom py-2">
-                            <span>Сирене</span>
-                            <span>6.90 евро</span>
-                        </div>
-
-                        <div class="d-flex justify-content-between pt-3 fw-bold">
-                            <span>Общо</span>
-                            <span>11.10 евро</span>
-                        </div>
-                    </div>
+                    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-light btn-lg">
+                        Регистрация
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="py-5 bg-light">
+<section class="landing-section landing-summary-strip">
     <div class="container">
-        <div class="row g-3">
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="border rounded-3 p-4 h-100 bg-white">
-                    <h2 class="h5">OCR извличане</h2>
-                    <p class="text-muted mb-0">
-                        Извличай текст от касови бележки напълно автоматично с OCR.
-                    </p>
-                </div>
+        <div class="landing-summary-grid">
+            <div>
+                <span>Автоматично извличане на текст</span>
+                <strong>OCR извлича автоматично текста, без да се налага да пишеш всичко от нулата.</strong>
             </div>
 
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="border rounded-3 p-4 h-100 bg-white">
-                    <h2 class="h5">Детайли</h2>
-                    <p class="text-muted mb-0">
-                        Извлечи търговец, дата, обща сума и всички покупки - бързо и лесно.
-                    </p>
-                </div>
+            <div>
+                <span>Редакция</span>
+                <strong>Възможност за редакция преди и след запазване на касова бележка.</strong>
             </div>
 
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="border rounded-3 p-4 h-100 bg-white">
-                    <h2 class="h5">Категории</h2>
-                    <p class="text-muted mb-0">
-                        Организирай разходите си в категории.
-                    </p>
-                </div>
-            </div>
-
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="border rounded-3 p-4 h-100 bg-white">
-                    <h2 class="h5">Анализи и отчети</h2>
-                    <p class="text-muted mb-0">
-                        Проследявай месечните си разходи в табличен и графичен вид.
-                    </p>
-                </div>
+            <div>
+                <span>Проследяване на разходи</span>
+                <strong>Проследяване на разходи, разпределени по категории и месеци.</strong>
             </div>
         </div>
     </div>
 </section>
 
-<section class="py-5">
+<section class="landing-section landing-preview-section">
     <div class="container">
-        <div class="row g-4 align-items-center">
-            <div class="col-12 col-lg-5">
-                <h2 class="h1 mb-3">Преглед на разходи</h2>
-                <p class="text-muted">
-                    След като касовите бележки бъдат запазени, можеш да намериш статистиките за своите разходи в таблото в твоя профил.
+        <div class="row align-items-center g-4">
+                <div class="col-12 col-lg-4">
+                <span class="landing-section-kicker">Табло</span>
+                <h2 class="landing-section-title">Проследяваш разходите си, без да събираш касови бележки.</h2>
+                <p class="landing-muted">
+                    Последните бележки, общите разходи и категориите са събрани на едно място.
                 </p>
-            </div>
 
-            <div class="col-12 col-lg-7">
-                <div class="row g-3">
-                    <div class="col-12 col-sm-4">
-                        <div class="border rounded-3 p-3 text-center h-100">
-                            <div class="text-muted small">Този месец</div>
-                            <div class="h4 mb-0">248.60 лв.</div>
-                            <div class="h4 mb-0">127.11 евро</div>
-                        </div>
-                    </div>
+                <a asp-controller="Dashboard" asp-action="Dashboard" class="btn btn-outline-primary btn-lg">
+                    Отвори таблото
+                </a>
+                </div>
 
-                    <div class="col-12 col-sm-4">
-                        <div class="border rounded-3 p-3 text-center h-100">
-                            <div class="text-muted small">Касови бележки</div>
-                            <div class="h4 mb-0">18</div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-sm-4">
-                        <div class="border rounded-3 p-3 text-center h-100">
-                            <div class="text-muted small">Водеща категория</div>
-                            <div class="h4 mb-0">Food</div>
-                        </div>
-                    </div>
-
-                    <div class="col-12">
-                        <div class="border rounded-3 p-4">
-                            <div class="d-flex align-items-end gap-2" style="height: 180px;">
-                                <div class="bg-primary rounded-top flex-fill" style="height: 45%;"></div>
-                                <div class="bg-primary rounded-top flex-fill" style="height: 70%;"></div>
-                                <div class="bg-primary rounded-top flex-fill" style="height: 55%;"></div>
-                                <div class="bg-primary rounded-top flex-fill" style="height: 85%;"></div>
-                                <div class="bg-primary rounded-top flex-fill" style="height: 60%;"></div>
-                                <div class="bg-primary rounded-top flex-fill" style="height: 75%;"></div>
-                            </div>
-
-                            <div class="d-flex gap-2 text-center mt-2">
-                                <div class="flex-fill">Яну</div>
-                                <div class="flex-fill">Фев</div>
-                                <div class="flex-fill">Мар</div>
-                                <div class="flex-fill">Апр</div>
-                                <div class="flex-fill">Май</div>
-                                <div class="flex-fill">Юни</div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-12 col-lg-8">
+                <div class="landing-dashboard-preview">
+                    <img src="~/images/landing-dashboard-preview.png"
+                         class="landing-dashboard-image"
+                         alt="Примерен изглед на таблото с разходи" />
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="py-5 bg-light">
-    <div class="container text-center">
-        <h2 class="h1 mb-3">Започни да организираш разходите си за пазаруване</h2>
-        <p class="text-muted mb-4">
-            Създай акаунт, за да запазваш касови бележки и да следиш историята на разходите си.
-        </p>
+    <section class="landing-section landing-preview-section">
+        <div class="container">
+            <div class="row align-items-center g-4">
 
-        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary btn-lg">
-            Регистрирай се
-        </a>
+                <div class="col-12 col-lg-8">
+                    <div class="landing-dashboard-preview">
+                        <img src="~/images/landing-dashboard-preview.png"
+                             class="landing-dashboard-image"
+                             alt="Примерен изглед на таблото с разходи" />
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-4">
+                    <span class="landing-section-kicker">Анализ</span>
+                    <h2 class="landing-section-title">Всички данни изобразени в графичен вид.</h2>
+                    <p class="landing-muted">
+                        Анализ на данните представен в графичен вид.
+                    </p>
+
+                    <a asp-controller="Dashboard" asp-action="Analytics" class="btn btn-outline-primary btn-lg">
+                        Анализи
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="landing-section landing-final-cta">
+    <div class="container">
+        <div class="landing-final-content">
+            <div>
+                <h2>Добави първата си бележка и виж резултата.</h2>
+            </div>
+
+            <div class="landing-final-actions">
+                <a asp-controller="Receipt" asp-action="Upload" class="btn btn-primary btn-lg">
+                    Изпробвай
+                </a>
+
+                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-secondary btn-lg">
+                    Регистрация
+                </a>
+            </div>
+        </div>
     </div>
 </section>

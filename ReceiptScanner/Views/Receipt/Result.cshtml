@@ -4,7 +4,7 @@
         ViewData["Title"] = "OCR Резултат";
     }
 
-    <section class="py-4 py-lg-5">
+    <section class="py-4 py-lg-4">
         <div class="container">
             @using (Html.BeginForm("ConfirmReceipt", "Receipt", FormMethod.Post))
             {
@@ -15,10 +15,10 @@
                 <input asp-for="IsTotalBGNSuggested" type="hidden" />
                 <input asp-for="IsTotalEURSuggested" type="hidden" />
 
-                <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+            <div class="dashboard-header mb-3 mb-4">
                     <div>
-                        <h1 class="h2 fw-bold mb-2">Преглед на OCR резултата</h1>
-                        <p class="text-muted mb-0">
+                        <h1 class="mb-2">Преглед на OCR резултата</h1>
+                        <p class="mb-0">
                             Провери извлечените данни от касовата бележка, коригирай грешки, добави липсващи продукти или премахни грешни редове.
                         </p>
                     </div>
@@ -34,7 +34,7 @@
 
                 <div class="row g-4">
                     <div class="col-12 col-lg-4">
-                        <div class="border rounded-3 p-3 p-md-4 h-100">
+                    <div class="border rounded-4 p-4 shadow-sm h-100 bg-white">
                             <h2 class="h5 fw-semibold mb-3">Обобщение на касовата бележка</h2>
 
                             <div class="mb-3">
@@ -90,7 +90,7 @@
                     </div>
 
                     <div class="col-12 col-lg-8">
-                        <div class="border rounded-3 p-3 p-md-4 h-100">
+                    <div class="border rounded-4 p-4 shadow-sm h-100 bg-white">
                             <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mb-3">
                                 <div>
                                     <h2 class="h5 fw-semibold mb-1">Закупени продукти</h2>
@@ -229,7 +229,7 @@
                     </div>
 
                     <div class="col-12">
-                        <div class="border rounded-3 p-3 p-md-4">
+                    <div class="border rounded-4 p-4 shadow-sm h-100 bg-white">
                             <h2 class="h5 fw-semibold mb-3">OCR текст</h2>
 
                             @if (Model.RawTextLines.Count > 0)
@@ -245,14 +245,14 @@
                             {
                                 <p class="text-muted mb-0">OCR не успя да извлече текст.</p>
                             }
+
+                        <div class="d-grid d-md-flex justify-content-md-end mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                Потвърди и запази
+                            </button>
+                        </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="d-grid d-md-flex justify-content-md-end mt-4">
-                    <button type="submit" class="btn btn-success btn-lg">
-                        Потвърди и запази
-                    </button>
                 </div>
             }
         </div>

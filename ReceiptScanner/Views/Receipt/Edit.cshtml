@@ -4,7 +4,7 @@
     ViewData["Title"] = "Редактиране на касова бележка";
 }
 
-<section class="py-4 py-lg-5">
+<section class="py-4 py-lg-4">
     <div class="container">
         @using (Html.BeginForm("Edit", "Receipt", FormMethod.Post))
         {
@@ -12,26 +12,26 @@
             <input asp-for="ReceiptId" type="hidden" />
             <input asp-for="RawText" type="hidden" />
 
-            <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+            <div class="dashboard-header mb-3 mb-4">
                 <div>
-                    <h1 class="h2 fw-bold mb-2">Редактиране на касова бележка</h1>
-                    <p class="text-muted mb-0">
+                    <h1 class="mb-2">Редактиране на касова бележка</h1>
+                    <p class="mb-0">
                         Актуализирай запазеното обобщение и списъка с продукти.
                     </p>
                 </div>
 
-                <div class="d-flex gap-2 align-items-end pb-1">
+                <div class="d-flex flex-wrap gap-2 align-items-end pb-1">
+                    <button type="submit"
+                            class="btn btn-primary px-3 py-2">
+                        Запази промените
+                    </button>
+
                     <a asp-controller="Receipt"
                        asp-action="Details"
                        asp-route-id="@Model.ReceiptId"
-                       class="btn btn-outline-secondary px-3 py-2">
+                       class="btn btn-primary px-3 py-2">
                         Отказ
                     </a>
-
-                    <button type="submit"
-                            class="btn btn-success px-3 py-2">
-                        Запази промените
-                    </button>
                 </div>
             </div>
 
@@ -39,7 +39,7 @@
 
             <div class="row g-4">
                 <div class="col-12 col-lg-4">
-                    <div class="border rounded-3 p-3 p-md-4 h-100">
+                    <div class="border rounded-4 p-4 shadow-sm h-100 bg-white">
                         <h2 class="h5 fw-semibold mb-3">Обобщение на касовата бележка</h2>
 
                         <div class="mb-3">
@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="col-12 col-lg-8">
-                    <div class="border rounded-3 p-3 p-md-4 h-100">
+                    <div class="border rounded-4 p-4 shadow-sm h-100 bg-white">
                         <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mb-3">
                             <div>
                                 <h2 class="h5 fw-semibold mb-1">Закупени продукти</h2>
@@ -155,21 +155,20 @@
                              class="alert alert-warning mt-3 mb-0 @(Model.Items.Count > 0 ? "d-none" : "")">
                             В момента няма добавени продукти. При нужда добави продукт ръчно.
                         </div>
+                        <div class="d-grid d-md-flex justify-content-md-end gap-2 mt-4">
+                            <a asp-controller="Receipt"
+                               asp-action="Details"
+                               asp-route-id="@Model.ReceiptId"
+                               class="btn btn-outline-secondary btn-lg">
+                                Отказ
+                            </a>
+
+                            <button type="submit" class="btn btn-success btn-lg">
+                                Запази промените
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="d-grid d-md-flex justify-content-md-end gap-2 mt-4">
-                <a asp-controller="Receipt"
-                   asp-action="Details"
-                   asp-route-id="@Model.ReceiptId"
-                   class="btn btn-outline-secondary btn-lg">
-                    Отказ
-                </a>
-
-                <button type="submit" class="btn btn-success btn-lg">
-                    Запази промените
-                </button>
             </div>
         }
     </div>
