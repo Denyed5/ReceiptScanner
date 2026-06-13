@@ -433,7 +433,7 @@ namespace ReceiptScanner.Controllers
             {
                 var detection =
                     await _categoryDetectionService
-                        .DetectCategoryAsync(item.Name);
+                        .DetectCategory(item.Name);
 
                 item.CategoryId =
                     detection.CategoryId;

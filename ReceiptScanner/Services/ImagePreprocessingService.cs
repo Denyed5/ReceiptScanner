@@ -20,7 +20,7 @@ namespace ReceiptScanner.Services
             return Sharpen(deskewed);
         }
 
-        private Mat ResizeForOcr(Mat image)
+        internal Mat ResizeForOcr(Mat image)
         {
             int targetWidth = image.Width;
 
@@ -50,7 +50,7 @@ namespace ReceiptScanner.Services
             return resized;
         }
 
-        private Mat ConvertToGray(Mat image)
+        internal Mat ConvertToGray(Mat image)
         {
             if (image.Channels() == 1)
             {

@@ -20,38 +20,29 @@ namespace ReceiptScanner.Services
             "ОПЕРАТОР", "КАСИЕР"
         };
 
-        private static readonly string[] TotalsSectionKeywords =
+        private static readonly string[] TotalKeywords =
         {
             "ОБЩО",
-            "ОБЩА СУМА",
-            "TOTAL",
-            "ТОТАЛ",
-            "СУМА ЕВРО",
-            "ОБЩА СУМА ЕВРО"
-        };
-
-        private static readonly string[] TotalEurKeywords =
-        {
-            "ОБЩА СУМА",
-            "ОБЩО",
+            "ОБЩА",
+            "СУМА",
             "ЗА ПЛАЩАНЕ",
-            "ДЪЛЖИМА СУМА",
-            "ВСИЧКО",
-            "TOTAL",
-            "ТОТАЛ",
-            "ОБЩА СУМА ЕВРО"
+            "ДЪЛЖИМА",
+            "ВСИЧКО"
         };
 
-        private static readonly string[] TotalBgnKeywords =
+        private static readonly string[] EurKeywords =
+        {
+            "ЕВРО",
+            "EUR",
+            "EURO"
+        };
+
+        private static readonly string[] BgnKeywords =
         {
             "ЛВ",
-            "ЛВ.",
             "ЛЕВА",
-            "ЛЕВ",
             "BGN",
-            "(ЛВ)",
-            "ОБЩА СУМА ЛЕВА",
-            "ОБЩА СУМА ЛВ"
+            "ЛЕ"
         };
 
         private static readonly string[] TotalIgnoreKeywords =
@@ -229,37 +220,62 @@ namespace ReceiptScanner.Services
 
         public decimal? ExtractTotalSumEUR(List<string> lines)
         {
-            return ExtractTotal(lines, TotalEurKeywords, TotalIgnoreKeywords);
+            var totalLines = GetTotalLines(lines);
+
+            foreach (var line in totalLines)
+            {
+                if (!ContainsAny(line, EurKeywords))
+                    continue;
+
+                var price = ExtractLastPrice(line);
+
+                if (price.HasValue)
+                    return price;
+            }
+
+            return null;
         }
 
         public decimal? ExtractTotalSumBGN(List<string> lines)
         {
-            return ExtractTotal(lines, TotalBgnKeywords, TotalIgnoreKeywords);
-        }
+            var totalLines = GetTotalLines(lines);
 
-        private static decimal? ExtractTotal(
-            List<string> lines,
-            string[] totalKeywords,
-            string[] ignoreKeywords)
-        {
-            foreach (var keyword in totalKeywords)
+            foreach (var line in totalLines)
             {
-                foreach (var line in lines)
-                {
-                    if (!line.Contains(keyword, StringComparison.OrdinalIgnoreCase))
-                        continue;
+                if (!ContainsAny(line, BgnKeywords))
+                    continue;
 
-                    if (ContainsAny(line, ignoreKeywords))
-                        continue;
+                var price = ExtractLastPrice(line);
 
-                    var price = ExtractLastPrice(line);
-
-                    if (price.HasValue)
-                        return price.Value;
-                }
+                if (price.HasValue)
+                    return price;
             }
 
             return null;
+        }
+
+        private List<string> GetTotalLines(List<string> lines)
+        {
+            var result = new List<string>();
+
+            for (int i = 0; i < lines.Count; i++)
+            {
+                if (!ContainsAny(lines[i], TotalKeywords))
+                    continue;
+
+                if (ContainsAny(lines[i], TotalIgnoreKeywords))
+                    continue;
+
+                if (i > 0)
+                    result.Add(lines[i - 1]);
+
+                result.Add(lines[i]);
+
+                if (i < lines.Count - 1)
+                    result.Add(lines[i + 1]);
+            }
+
+            return result.Distinct().ToList();
         }
 
         private static decimal? ExtractLastPrice(string line)
@@ -318,7 +334,7 @@ namespace ReceiptScanner.Services
         }
         private static bool IsTotalLine(string line)
         {
-            return ContainsAny(line, TotalsSectionKeywords)
+            return ContainsAny(line, TotalKeywords)
                 || line.Contains("ЗА ПЛАЩАНЕ", StringComparison.OrdinalIgnoreCase)
                 || line.Contains("ДЪЛЖИМА СУМА", StringComparison.OrdinalIgnoreCase)
                 || line.Contains("ВСИЧКО", StringComparison.OrdinalIgnoreCase);

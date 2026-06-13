@@ -8,7 +8,7 @@ namespace ReceiptScanner.Services
         private readonly IWebHostEnvironment _env;
 
         public OcrService(IWebHostEnvironment env)
-        {
+        {       
             _env = env;
         }
 
@@ -36,7 +36,7 @@ namespace ReceiptScanner.Services
 
             return result;
         }
-        private string CleanGarbage(string text)
+        internal string CleanGarbage(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
                 return "";

@@ -13,7 +13,6 @@ namespace ReceiptScanner.Services
 
     public class CategoryDetectionService
     {
-        private readonly ReceiptScannerContext _context;
 
         private readonly Dictionary<string, string[]> _categoryKeywords =
             new()
@@ -27,6 +26,8 @@ namespace ReceiptScanner.Services
                     "свински",
                     "телешко",
                     "телешки",
+                    "пуешко",
+                    "пуешки",
                     "кайма",
                     "салам",
                     "шунка",
@@ -216,16 +217,9 @@ namespace ReceiptScanner.Services
                     "джин",
                     "ром"
                 }
-            };
+            };  
 
-        public CategoryDetectionService(
-            ReceiptScannerContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<CategoryDetectionResult>
-            DetectCategoryAsync(string productName)
+        public async Task<CategoryDetectionResult> DetectCategory(string productName)
         {
             if (string.IsNullOrWhiteSpace(productName))
             {

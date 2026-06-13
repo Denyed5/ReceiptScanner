@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="ReceiptScanner.Tests/ReceiptScanner.Tests.csproj" Id="92ce4677-287f-46f5-8380-f55f0b19d1f7" />
   <Project Path="ReceiptScanner/ReceiptScanner.csproj" />
 </Solution>
