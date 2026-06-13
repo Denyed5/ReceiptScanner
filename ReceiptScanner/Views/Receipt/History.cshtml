@@ -34,30 +34,31 @@
 
         @if (Model.Count == 0)
         {
-            <div class="border rounded-4 p-4 shadow-sm h-100 bg-white text-center">
+            <div class="border rounded-4 p-4 shadow-sm h-100 bg-white">
+
                 <div class="d-flex flex-wrap gap-2 mb-3">
 
                     <a asp-action="History"
                        asp-route-period="week"
-                       class="btn btn-outline-primary">
+                       class="btn btn-primary">
                         Тази седмица
                     </a>
 
                     <a asp-action="History"
                        asp-route-period="month"
-                       class="btn btn-outline-primary">
+                       class="btn btn-primary">
                         Този месец
                     </a>
 
                     <a asp-action="History"
                        asp-route-period="30days"
-                       class="btn btn-outline-primary">
+                       class="btn btn-primary">
                         Последни 30 дни
                     </a>
 
                     <a asp-action="History"
                        asp-route-period="year"
-                       class="btn btn-outline-primary">
+                       class="btn btn-primary">
                         Тази година
                     </a>
 
@@ -81,6 +82,7 @@
                 <a asp-controller="Receipt" asp-action="Upload" class="btn btn-primary btn-lg">
                     Сканирай първата си касова бележка
                 </a>
+                </div>
             </div>
         }
         else
