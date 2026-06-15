@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'image/bmp'
     ]);
     const supportedImageExtensions = ['.jpg', '.jpeg', '.png', '.bmp'];
-    const unsupportedImageMessage = 'Unsupported image format. Please upload a JPG, PNG, or BMP receipt image.';
+    const unsupportedImageMessage = 'Неподдържан файлов формат. Моля добавете с разширение .jpg, .jpeg, .png или .bmp.';
 
     const cameraInput = document.getElementById('cameraInput');
     const fileInput = document.getElementById('receiptInput');
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
         image.onerror = function () {
             e.target.value = '';
             resetPreview();
-            showUploadError('The selected file could not be loaded as an image. Please choose a different receipt image.');
+            showUploadError('Избраният файл не може да се зареди. Моля изберете друг или пробравайте отново.');
         };
     }
 
@@ -95,6 +95,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (cropper) {
             const canvas = cropper.getCroppedCanvas();
             croppedImage.value = canvas.toDataURL('image/png');
+        }
+
+        const loadingModal = new bootstrap.Modal(
+            document.getElementById("loadingModal")
+        );
+        if (image.src) {
+            loadingModal.show();
         }
 
         form.submit();

@@ -401,13 +401,13 @@ namespace ReceiptScanner.Controllers
                 }
                 catch (OpenCVException)
                 {
-                    return UploadViewWithError(model, "The selected file could not be loaded as an image. Please choose a different receipt image.");
+                    return UploadViewWithError(model, "Файлът не може да бъде отворен. Моля използвайте друг файл или опитайте отново.");
                 }
 
                 using Mat image = decodedImage;
                 if (image.Empty())
                 {
-                    return UploadViewWithError(model, "The selected file could not be loaded as an image. Please choose a different receipt image.");
+                    return UploadViewWithError(model, "Файлът не може да бъде отворен. Моля използвайте друг файл или опитайте отново.");
                 }
 
                 using var processed = _preprocessing.Preprocess(image);
@@ -476,12 +476,12 @@ namespace ReceiptScanner.Controllers
 
             if (!model.TotalBGN.HasValue)
             {
-                ModelState.AddModelError(nameof(ReceiptModel.TotalBGN), "Total in BGN is required.");
+                ModelState.AddModelError(nameof(ReceiptModel.TotalBGN), "Общата сума в лева е задължителна.");
             }
 
             if (!model.TotalEUR.HasValue)
             {
-                ModelState.AddModelError(nameof(ReceiptModel.TotalEUR), "Total in EUR is required.");
+                ModelState.AddModelError(nameof(ReceiptModel.TotalEUR), "Общата сума в евро е задължителна.");
             }
 
             if (!ModelState.IsValid)

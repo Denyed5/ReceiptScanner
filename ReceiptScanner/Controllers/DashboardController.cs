@@ -146,7 +146,7 @@ namespace ReceiptScanner.Controllers
                 .GroupBy(r => r.Date!.Value.ToString("MMM yyyy"))
                 .ToDictionary(
                     g => g.Key,
-                    g => g.Sum(r => r.TotalBGN ?? 0));
+                    g => g.Sum(r => r.TotalEUR ?? 0));
 
             var totalSpentEURPeriod = receipts.Sum(r => r.TotalEUR ?? 0);
             var totalSpentBGNPeriod = receipts.Sum(r => r.TotalBGN ?? 0);
