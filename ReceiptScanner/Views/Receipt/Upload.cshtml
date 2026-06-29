@@ -37,6 +37,18 @@
                                     Изображение на касова бележка (.jpg, .jpeg, .png, .bmp)
                                 </label>
 
+                                <button type="button"
+                                        class="btn btn-link p-0 ms-auto"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-html="true"
+                                        data-bs-custom-class="tips"
+                                        data-bs-title="За най-добри резултати се препоръчва:
+                                        <br> 1. Добра осветеност на заснетите изображения.
+                                        <br> 2. Заснемане директно над бележката.
+                                        <br> 3. Заснемане непосредствено след издаването на касовата бележка.">
+                                    <i class="bi bi-info-circle"></i>
+                                </button>
+
                                 <div class="d-grid d-sm-flex gap-2 mb-3">
                                     <button class="btn btn-primary" type="button" id="takePhotoBtn">
                                         Направи снимка
@@ -58,6 +70,7 @@
                                         <div id="emptyPreview" class="text-muted text-center p-5">
                                             Направи снимка или избери изображение на касова бележка, за да го прегледаш и изрежеш тук.
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -93,11 +106,21 @@
                                     </label>
                                 </div>
 
-                                <div class="form-check form-switch mt-4">
-                                    <input class="form-check-input" asp-for="UsePreprocessing" type="checkbox" />
-                                    <label class="form-check-label" asp-for="UsePreprocessing">
+                                <div class="mt-4 p-3 rounded-3 bg-light border d-flex align-items-center gap-2">
+                                    <input class="form-check-input m-0" asp-for="UsePreprocessing" type="checkbox" />
+
+                                    <label class="form-check-label fw-semibold mb-0" asp-for="UsePreprocessing">
                                         Допълнителна обработка на изображението
                                     </label>
+
+                                    <button type="button"
+                                            class="btn btn-link p-0 ms-auto"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-custom-class="tips"
+                                            data-bs-title="Подобрява резултатите от разчитане на касови бележки 
+                                                           при снимки, които са тъмни, размазани или с нисък контраст.">
+                                        <i class="bi bi-info-circle"></i>
+                                    </button>
                                 </div>
 
                                 <button class="btn btn-success btn-lg w-100 mt-4" id="scanBtn" type="button">
@@ -164,4 +187,9 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/receipt-upload.js" asp-append-version="true"></script>
+    <script>
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (element) {
+        new bootstrap.Tooltip(element);
+        });
+    </script>
 }

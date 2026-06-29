@@ -811,3 +811,9 @@ body {
     background: #1e3a8a;
     border-radius: 999px;
 }
+
+.tips .tooltip-inner {
+    max-width: 280px;
+    text-align: left;
+    line-height:1.4;
+}
